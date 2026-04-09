@@ -1,0 +1,86 @@
+/* ═══════════════════════════════════════
+   MiAula — Variables y Reset Global
+═══════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Marca */
+  --navy:         #0F1E5C;
+  --navy-mid:     #1A3080;
+  --brand:        #1A5CFF;
+  --brand-light:  #E8EFFE;
+  --brand-mid:    #4D7DFF;
+
+  /* Semánticos */
+  --accent:       #FF6B35;
+  --accent-light: #FFF0EB;
+  --green:        #0F9B6E;
+  --green-light:  #E2F7F0;
+  --amber:        #E09600;
+  --amber-light:  #FFF8E0;
+  --red:          #D93025;
+  --red-light:    #FEECEB;
+  --purple:       #6D28D9;
+  --purple-light: #EDE9FE;
+
+  /* Texto */
+  --text:         #111827;
+  --text-muted:   #6B7280;
+  --text-light:   #9CA3AF;
+
+  /* Bordes y superficies */
+  --border:       rgba(0,0,0,0.08);
+  --border-md:    rgba(0,0,0,0.13);
+  --surface:      #F8F9FC;
+  --white:        #ffffff;
+
+  /* Layout */
+  --sidebar-w:    240px;
+
+  /* Tipografía */
+  --font:   'Sora', sans-serif;
+  --serif:  'Lora', serif;
+
+  /* Radios */
+  --radius:    10px;
+  --radius-lg: 14px;
+
+  /* Sombras */
+  --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+}
+
+body {
+  font-family: var(--font);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Animaciones ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+.fade-up { animation: fadeUp 0.3s ease both; }
+
+/* ── Utilidades ── */
+.flex        { display: flex; }
+.gap-8       { gap: 8px; }
+.gap-12      { gap: 12px; }
+.mb-20       { margin-bottom: 20px; }
+.mb-28       { margin-bottom: 28px; }
+.grid-2      { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.text-muted  { color: var(--text-muted); }
+.text-sm     { font-size: 12px; }
+.fw-500      { font-weight: 500; }
+.divider     { height: 1px; background: var(--border); margin: 20px 0; }

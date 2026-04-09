@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiAula — Sistema Gestor de Actividades Académicas</title>
+
+  <!-- ── CSS Modules ── -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+  PANTALLA DE AUTENTICACIÓN
+═══════════════════════════════════════════════════ -->
+<div id="auth-screen">
+
+  <!-- Panel izquierdo: branding -->
+  <div class="auth-left">
+    <div class="auth-brand">MiAula</div>
+    <p class="auth-tagline">
+      Sistema Gestor de Actividades Académicas.<br>
+      Organiza, entrega y comunica en un solo lugar.
+    </p>
+    <div class="auth-features">
+      <div class="auth-feat"><div class="feat-icon">✅</div> Gestión de tareas y actividades</div>
+      <div class="auth-feat"><div class="feat-icon">📁</div> Almacenamiento de recursos</div>
+      <div class="auth-feat"><div class="feat-icon">📊</div> Calificaciones y retroalimentación</div>
+      <div class="auth-feat"><div class="feat-icon">💬</div> Comunicación docente-alumno</div>
+    </div>
+  </div>
+
+  <!-- Panel derecho: formularios -->
+  <div class="auth-right">
+
+    <!-- Formulario: Login -->
+    <div class="auth-box" id="login-form">
+      <div class="auth-title">Iniciar sesión</div>
+      <div class="auth-sub">Accede a tu plataforma académica</div>
+
+      <div class="error-msg" id="login-error"></div>
+
+      <div class="form-group">
+        <label class="form-label">Correo electrónico</label>
+        <input type="email" class="form-input" id="login-email"
+               placeholder="ejemplo@escuela.edu.mx"
+               onkeydown="if(event.key==='Enter') handleLogin()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-input" id="login-pass"
+               placeholder="••••••••"
+               onkeydown="if(event.key==='Enter') handleLogin()">
+      </div>
+
+      <button class="btn-primary" onclick="handleLogin()">Ingresar</button>
+
+      <div class="auth-toggle">
+        ¿No tienes cuenta? <a onclick="showRegister()">Regístrate aquí</a>
+      </div>
+
+      <div class="auth-demo-hint">
+        <strong>Cuentas demo</strong><br>
+        👩‍🏫 Docente: docente@demo.mx / 123456<br>
+        🎓 Alumno:&nbsp; alumno@demo.mx / 123456
+      </div>
+    </div>
+
+    <!-- Formulario: Registro -->
+    <div class="auth-box" id="register-form" style="display:none">
+      <div class="auth-title">Crear cuenta</div>
+      <div class="auth-sub">Únete a MiAula — es gratis</div>
+
+      <div class="error-msg" id="reg-error"></div>
+
+      <div class="form-group">
+        <label class="form-label">Nombre completo</label>
+        <input type="text" class="form-input" id="reg-name" placeholder="Tu nombre completo">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Correo electrónico</label>
+        <input type="email" class="form-input" id="reg-email" placeholder="correo@escuela.edu.mx">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-input" id="reg-pass" placeholder="Mínimo 6 caracteres">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Soy...</label>
+        <div class="role-selector">
+          <div class="role-btn selected" id="role-docente" onclick="selectRole('docente')">
+            <span class="role-emoji">👩‍🏫</span>
+            <span class="role-name">Docente</span>
+          </div>
+          <div class="role-btn" id="role-alumno" onclick="selectRole('alumno')">
+            <span class="role-emoji">🎓</span>
+            <span class="role-name">Alumno</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="handleRegister()">Crear cuenta</button>
+
+      <div class="auth-toggle">
+        ¿Ya tienes cuenta? <a onclick="showLogin()">Inicia sesión</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+  PANTALLA PRINCIPAL DE LA APP
+═══════════════════════════════════════════════════ -->
+<div id="app-screen">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-brand">MiAula</div>
+      <span class="sidebar-role-tag" id="sidebar-role-tag">Rol</span>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar">U</div>
+      <div>
+        <div class="user-name" id="sidebar-uname">Usuario</div>
+        <div class="user-meta" id="sidebar-urole">Rol</div>
+      </div>
+      <button class="btn-logout" onclick="logout()" title="Cerrar sesión">↩</button>
+    </div>
+  </aside>
+
+  <!-- ── Contenido principal ── -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="page-heading" id="page-heading">Inicio</div>
+      <div class="topbar-right" id="topbar-actions"></div>
+    </div>
+
+    <!-- Área de vistas -->
+    <div class="content-area">
+
+      <!-- Vista: Inicio / Dashboard -->
+      <div class="view active" id="view-inicio">
+        <div class="stats-grid" id="stats-grid"></div>
+        <div class="section-header">
+          <span class="section-title" id="home-section-title">Actividades recientes</span>
+        </div>
+        <div id="home-content"></div>
+      </div>
+
+      <!-- Vista: Tareas -->
+      <div class="view" id="view-tareas">
+        <div class="tab-bar" id="tareas-tabs"></div>
+        <div id="tareas-content"></div>
+      </div>
+
+      <!-- Vista: Recursos -->
+      <div class="view" id="view-recursos">
+        <div id="recursos-content"></div>
+      </div>
+
+      <!-- Vista: Calificaciones -->
+      <div class="view" id="view-calificaciones">
+        <div id="calificaciones-content"></div>
+      </div>
+
+      <!-- Vista: Mensajes -->
+      <div class="view" id="view-mensajes">
+        <div class="msg-layout">
+          <div class="msg-list">
+            <div class="msg-list-header">Conversaciones</div>
+            <div id="msg-contacts"></div>
+          </div>
+          <div class="msg-main">
+            <div class="msg-topbar" id="msg-topbar">
+              <div class="user-avatar" id="msg-av"
+                   style="width:32px;height:32px;font-size:11px;flex-shrink:0">?</div>
+              <div>
+                <div class="msg-contact-name" id="msg-contact-name">Selecciona una conversación</div>
+                <div class="msg-contact-role" id="msg-contact-role"></div>
+              </div>
+            </div>
+            <div class="msg-body" id="msg-body"></div>
+            <div class="msg-input-bar">
+              <input class="msg-input" id="msg-input"
+                     placeholder="Escribe un mensaje..."
+                     onkeydown="if(event.key==='Enter') ViewMensajes.send()">
+              <button class="btn-action" onclick="ViewMensajes.send()">Enviar ↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista: Alumnos (solo Docente) -->
+      <div class="view" id="view-alumnos">
+        <div id="alumnos-content"></div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-content -->
+</div><!-- /app-screen -->
+
+
+<!-- ═══════════════════════════════════════════════════
+  MODALES
+═══════════════════════════════════════════════════ -->
+
+<!-- Modal: Crear / Editar tarea -->
+<div class="modal-overlay" id="modal-tarea">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-tarea-title">Nueva tarea</div>
+      <button class="modal-close" onclick="closeModal('modal-tarea')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Título *</label>
+        <input type="text" class="form-input" id="t-titulo" placeholder="Nombre de la tarea">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-textarea" id="t-desc" placeholder="Instrucciones detalladas..."></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Materia *</label>
+          <input type="text" class="form-input" id="t-materia" placeholder="ej. Matemáticas III">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de entrega *</label>
+          <input type="date" class="form-input" id="t-fecha">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Valor (puntos)</label>
+        <input type="number" class="form-input" id="t-puntos" placeholder="100" min="0" max="1000">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-tarea')">Cancelar</button>
+      <button class="btn-action"    onclick="ModTareas.save()">💾 Guardar tarea</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Subir recurso -->
+<div class="modal-overlay" id="modal-recurso">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Agregar recurso</div>
+      <button class="modal-close" onclick="closeModal('modal-recurso')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nombre del recurso *</label>
+        <input type="text" class="form-input" id="r-nombre" placeholder="ej. Presentación Unidad 3">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Materia</label>
+        <input type="text" class="form-input" id="r-materia" placeholder="ej. Estadística">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de recurso</label>
+        <select class="form-select" id="r-tipo">
+          <option value="📄 PDF">📄 PDF</option>
+          <option value="📊 Presentación">📊 Presentación</option>
+          <option value="🎥 Video">🎥 Video</option>
+          <option value="🔗 Enlace">🔗 Enlace</option>
+          <option value="📝 Documento">📝 Documento</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-textarea" id="r-desc"
+                  placeholder="Descripción breve del recurso..."
+                  style="min-height:70px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-recurso')">Cancelar</button>
+      <button class="btn-action"    onclick="saveRecurso()">📁 Agregar recurso</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Entregar tarea (alumno) -->
+<div class="modal-overlay" id="modal-entrega">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📤 Entregar tarea</div>
+      <button class="modal-close" onclick="closeModal('modal-entrega')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="entrega-info-box" id="entrega-tarea-info"></div>
+      <div class="form-group">
+        <label class="form-label">Comentarios / respuesta</label>
+        <textarea class="form-textarea" id="e-comentario"
+                  placeholder="Escribe tu respuesta o comentarios sobre la entrega..."></textarea>
+      </div>
+      <div class="adjunto-box">
+        <span class="adjunto-icon">📎</span>
+        <div>
+          <div class="adjunto-label">Adjuntar archivo</div>
+          <div class="adjunto-sub">Simulación — en versión real permite subir archivos</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-entrega')">Cancelar</button>
+      <button class="btn-success"   onclick="ModEntrega.confirm()">✅ Confirmar entrega</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Calificar entrega (docente) -->
+<div class="modal-overlay" id="modal-calificar">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📊 Calificar entrega</div>
+      <button class="modal-close" onclick="closeModal('modal-calificar')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="entrega-info-box" id="cal-info"></div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Calificación *</label>
+          <input type="number" class="form-input" id="cal-nota" placeholder="0 – 100" min="0" max="1000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Puntos máximos</label>
+          <input type="text"   class="form-input" id="cal-max" disabled>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Retroalimentación</label>
+        <textarea class="form-textarea" id="cal-feedback"
+                  placeholder="Comentarios y sugerencias para el alumno..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-calificar')">Cancelar</button>
+      <button class="btn-action"    onclick="ModCalificar.save()">💾 Guardar calificación</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+  JS MODULES  (orden de carga importa)
+═══════════════════════════════════════════════════ -->
+<script src="js/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/views/inicio.js"></script>
+<script src="js/views/tareas.js"></script>
+<script src="js/views/views.js"></script>
+<script src="js/router.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
