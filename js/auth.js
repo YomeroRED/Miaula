@@ -12,17 +12,15 @@ function selectRole(role) {
   document.getElementById('role-alumno').classList.toggle('selected', role === 'alumno');
 }
 
-/** Muestra el formulario de registro, oculta el de login */
+/** Muestra el formulario de registro (activa el panel deslizante) */
 function showRegister() {
-  document.getElementById('login-form').style.display   = 'none';
-  document.getElementById('register-form').style.display = 'block';
+  document.getElementById('authContainer').classList.add('active');
   hideError('login-error');
 }
 
-/** Muestra el formulario de login, oculta el de registro */
+/** Muestra el formulario de login (desactiva el panel deslizante) */
 function showLogin() {
-  document.getElementById('register-form').style.display = 'none';
-  document.getElementById('login-form').style.display    = 'block';
+  document.getElementById('authContainer').classList.remove('active');
   hideError('reg-error');
 }
 
@@ -100,6 +98,5 @@ function logout() {
   App.currentView = 'inicio';
 
   document.getElementById('app-screen').classList.remove('active');
-  document.getElementById('auth-screen').style.display = 'flex';
-  showLogin();
+  document.getElementById('authContainer').classList.remove('active');
 }

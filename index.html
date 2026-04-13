@@ -18,27 +18,10 @@
   PANTALLA DE AUTENTICACIÓN
 ═══════════════════════════════════════════════════ -->
 <div id="auth-screen">
-
-  <!-- Panel izquierdo: branding -->
-  <div class="auth-left">
-    <div class="auth-brand">MiAula</div>
-    <p class="auth-tagline">
-      Sistema Gestor de Actividades Académicas.<br>
-      Organiza, entrega y comunica en un solo lugar.
-    </p>
-    <div class="auth-features">
-      <div class="auth-feat"><div class="feat-icon">✅</div> Gestión de tareas y actividades</div>
-      <div class="auth-feat"><div class="feat-icon">📁</div> Almacenamiento de recursos</div>
-      <div class="auth-feat"><div class="feat-icon">📊</div> Calificaciones y retroalimentación</div>
-      <div class="auth-feat"><div class="feat-icon">💬</div> Comunicación docente-alumno</div>
-    </div>
-  </div>
-
-  <!-- Panel derecho: formularios -->
-  <div class="auth-right">
+  <div class="auth-container" id="authContainer">
 
     <!-- Formulario: Login -->
-    <div class="auth-box" id="login-form">
+    <div class="auth-panel login-panel" id="login-form">
       <div class="auth-title">Iniciar sesión</div>
       <div class="auth-sub">Accede a tu plataforma académica</div>
 
@@ -59,10 +42,6 @@
 
       <button class="btn-primary" onclick="handleLogin()">Ingresar</button>
 
-      <div class="auth-toggle">
-        ¿No tienes cuenta? <a onclick="showRegister()">Regístrate aquí</a>
-      </div>
-
       <div class="auth-demo-hint">
         <strong>Cuentas demo</strong><br>
         👩‍🏫 Docente: docente@demo.mx / 123456<br>
@@ -71,7 +50,7 @@
     </div>
 
     <!-- Formulario: Registro -->
-    <div class="auth-box" id="register-form" style="display:none">
+    <div class="auth-panel register-panel" id="register-form">
       <div class="auth-title">Crear cuenta</div>
       <div class="auth-sub">Únete a MiAula — es gratis</div>
 
@@ -105,9 +84,36 @@
       </div>
 
       <button class="btn-primary" onclick="handleRegister()">Crear cuenta</button>
+    </div>
 
-      <div class="auth-toggle">
-        ¿Ya tienes cuenta? <a onclick="showLogin()">Inicia sesión</a>
+    <!-- Panel superpuesto deslizante -->
+    <div class="overlay-container" id="overlayContainer">
+      <div class="overlay-panel">
+
+        <!-- Cara izquierda: visible cuando estamos en Login (invita a registrarse) -->
+        <div class="overlay-face overlay-left">
+          <div class="auth-brand-logo">MiAula</div>
+          <p class="overlay-tagline">Sistema Gestor de Actividades Académicas.<br>Organiza, entrega y comunica en un solo lugar.</p>
+          <div class="auth-features">
+            <div class="auth-feat"><div class="feat-icon">✅</div> Gestión de tareas</div>
+            <div class="auth-feat"><div class="feat-icon">📁</div> Almacenamiento de recursos</div>
+            <div class="auth-feat"><div class="feat-icon">📊</div> Calificaciones y retroalimentación</div>
+            <div class="auth-feat"><div class="feat-icon">💬</div> Comunicación docente-alumno</div>
+          </div>
+          <div class="overlay-separator"></div>
+          <p class="overlay-invite">¿Aún no tienes cuenta?</p>
+          <button class="btn-overlay" onclick="showRegister()">Registrarse</button>
+        </div>
+
+        <!-- Cara derecha: visible cuando estamos en Registro (invita a login) -->
+        <div class="overlay-face overlay-right">
+          <div class="auth-brand-logo">MiAula</div>
+          <p class="overlay-tagline">¡Bienvenido de vuelta!<br>Nos alegra verte por aquí de nuevo.</p>
+          <div class="overlay-separator"></div>
+          <p class="overlay-invite">¿Ya tienes cuenta?</p>
+          <button class="btn-overlay" onclick="showLogin()">Iniciar sesión</button>
+        </div>
+
       </div>
     </div>
 

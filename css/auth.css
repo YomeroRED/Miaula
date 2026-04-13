@@ -1,95 +1,73 @@
 /* ═══════════════════════════════════════
-   MiAula — Módulo Auth (Login / Registro)
+   MiAula — Módulo Auth (Sliding Panel)
 ═══════════════════════════════════════ */
 
 #auth-screen {
   min-height: 100vh;
   display: flex;
   align-items: stretch;
+  justify-content: center;
+  background: var(--surface);
+  padding: 0;
 }
 
-/* ── Panel izquierdo ── */
-.auth-left {
-  width: 48%;
-  background: var(--navy);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 64px;
+/* ── Contenedor principal ── */
+.auth-container {
   position: relative;
+  width: 100vw;
+  max-width: 100%;
+  min-height: 100vh;
+  background: var(--white);
+  border-radius: 0;
   overflow: hidden;
-}
-.auth-left::before {
-  content: '';
-  position: absolute;
-  width: 500px; height: 500px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.03);
-  top: -200px; right: -150px;
-}
-.auth-left::after {
-  content: '';
-  position: absolute;
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: rgba(26,92,255,0.15);
-  bottom: -100px; left: -80px;
-}
-.auth-brand {
-  font-family: var(--serif);
-  font-size: 42px;
-  color: #fff;
-  margin-bottom: 14px;
-  position: relative;
-  z-index: 1;
-}
-.auth-tagline {
-  font-size: 15px;
-  color: rgba(255,255,255,0.6);
-  line-height: 1.8;
-  max-width: 340px;
-  position: relative;
-  z-index: 1;
-}
-.auth-features {
-  margin-top: 52px;
+  box-shadow: none;
   display: flex;
-  flex-direction: column;
-  gap: 18px;
-  position: relative;
-  z-index: 1;
-}
-.auth-feat {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: rgba(255,255,255,0.75);
-  font-size: 13px;
-}
-.feat-icon {
-  width: 34px; height: 34px;
-  border-radius: 9px;
-  background: rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  flex-shrink: 0;
 }
 
-/* ── Panel derecho ── */
-.auth-right {
-  flex: 1;
+/* ── Paneles de formulario ── */
+.auth-panel {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  padding: 48px;
+  padding: 48px 44px;
+  transition: all 0.65s cubic-bezier(0.68, -0.4, 0.27, 1.35);
   background: var(--white);
 }
-.auth-box {
-  width: 100%;
-  max-width: 400px;
+
+.login-panel {
+  left: 0;
+  opacity: 1;
+  z-index: 2;
+  transform: translateX(0);
 }
+
+.register-panel {
+  left: 0;
+  opacity: 0;
+  z-index: 1;
+  transform: translateX(-30px);
+  pointer-events: none;
+}
+
+.auth-container.active .login-panel {
+  transform: translateX(30px);
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.auth-container.active .register-panel {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 2;
+  pointer-events: all;
+}
+
+/* ── Títulos ── */
 .auth-title {
   font-size: 26px;
   font-weight: 600;
@@ -99,7 +77,159 @@
 .auth-sub {
   font-size: 13px;
   color: var(--text-muted);
-  margin-bottom: 32px;
+  margin-bottom: 28px;
+}
+
+/* ── Contenedor del panel superpuesto ── */
+.overlay-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 10;
+  transition: transform 0.65s cubic-bezier(0.68, -0.4, 0.27, 1.35);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.auth-container.active .overlay-container {
+  transform: translateX(-100%);
+  border-radius: 0;
+}
+
+/* ── Panel superpuesto interno ── */
+.overlay-panel {
+  position: relative;
+  width: 200%;
+  height: 100%;
+  display: flex;
+  background: var(--navy);
+  transition: transform 0.65s cubic-bezier(0.68, -0.4, 0.27, 1.35);
+}
+
+.auth-container.active .overlay-panel {
+  transform: translateX(-50%);
+}
+
+/* ── Caras del overlay ── */
+.overlay-face {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 52px 44px;
+  position: relative;
+}
+
+.overlay-face::before {
+  content: "";
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  top: -140px;
+  right: -100px;
+  pointer-events: none;
+}
+.overlay-face::after {
+  content: "";
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: rgba(26, 92, 255, 0.18);
+  bottom: -80px;
+  left: -60px;
+  pointer-events: none;
+}
+
+/* ── Contenido del overlay ── */
+.auth-brand-logo {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.overlay-tagline {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.8;
+  max-width: 280px;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-features {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+.auth-feat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+}
+.feat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.overlay-separator {
+  width: 48px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  margin: 28px 0 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.overlay-invite {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-overlay {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  color: #fff;
+  padding: 11px 32px;
+  border-radius: 100px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.btn-overlay:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fff;
 }
 
 /* ── Selector de rol ── */
@@ -119,7 +249,9 @@
   background: var(--white);
   font-family: var(--font);
 }
-.role-btn:hover { border-color: var(--brand); }
+.role-btn:hover {
+  border-color: var(--brand);
+}
 .role-btn.selected {
   border-color: var(--brand);
   background: var(--brand-light);
@@ -135,7 +267,7 @@
   color: var(--text);
 }
 
-/* ── Errores y toggle ── */
+/* ── Errores ── */
 .error-msg {
   background: var(--red-light);
   color: var(--red);
@@ -145,18 +277,8 @@
   margin-bottom: 16px;
   display: none;
 }
-.auth-toggle {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-.auth-toggle a {
-  color: var(--brand);
-  cursor: pointer;
-  font-weight: 500;
-  text-decoration: none;
-}
+
+/* ── Demo hint ── */
 .auth-demo-hint {
   margin-top: 20px;
   padding: 12px 14px;
@@ -166,4 +288,79 @@
   color: var(--text-muted);
   line-height: 1.7;
 }
-.auth-demo-hint strong { color: var(--text); }
+.auth-demo-hint strong {
+  color: var(--text);
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  #auth-screen {
+    padding: 0;
+    align-items: stretch;
+  }
+  .auth-container {
+    border-radius: 0;
+    min-height: 100vh;
+    flex-direction: column;
+    box-shadow: none;
+  }
+  .auth-panel {
+    width: 100%;
+    position: relative;
+    padding: 40px 24px 32px;
+    transform: none !important;
+    opacity: 1 !important;
+    pointer-events: all !important;
+  }
+  .login-panel {
+    display: flex;
+  }
+  .register-panel {
+    display: none;
+  }
+  .auth-container.active .login-panel {
+    display: none;
+  }
+  .auth-container.active .register-panel {
+    display: flex;
+  }
+  .overlay-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 160px;
+    border-radius: 0;
+    transform: none !important;
+    order: -1;
+  }
+  .overlay-panel {
+    width: 100%;
+    transform: none !important;
+    transition: none;
+  }
+  .overlay-face {
+    width: 100%;
+    padding: 28px 24px;
+    align-items: center;
+    text-align: center;
+  }
+  .overlay-left {
+    display: flex;
+  }
+  .overlay-right {
+    display: none;
+  }
+  .auth-container.active .overlay-left {
+    display: none;
+  }
+  .auth-container.active .overlay-right {
+    display: flex;
+  }
+  .auth-features {
+    display: none;
+  }
+  .overlay-face::before,
+  .overlay-face::after {
+    display: none;
+  }
+}
