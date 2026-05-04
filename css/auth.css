@@ -149,15 +149,19 @@
 
 /* ── Contenido del overlay ── */
 .auth-brand-logo {
-  font-family: var(--serif);
-  font-size: 36px;
-  font-weight: 600;
-  color: #fff;
+  display: flex;
+  align-items: center;
   margin-bottom: 16px;
   position: relative;
   z-index: 1;
 }
 
+.auth-brand-logo img {
+  height: 72px;
+  width: auto;
+  filter: brightness(0) invert(1); /* lo vuelve blanco para el fondo navy */
+  object-fit: contain;
+}
 .overlay-tagline {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.65);
