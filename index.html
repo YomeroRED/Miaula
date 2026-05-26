@@ -137,6 +137,9 @@
       <span class="sidebar-role-tag" id="sidebar-role-tag">Rol</span>
     </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-gear-wrap">
+      <div class="nav-item nav-gear" id="sidebar-gear" data-view="perfil"></div>
+    </div>
     <div class="sidebar-user">
       <div class="user-avatar" id="sidebar-avatar">U</div>
       <div>
@@ -214,6 +217,16 @@
       <!-- Vista: Alumnos (solo Docente) -->
       <div class="view" id="view-alumnos">
         <div id="alumnos-content"></div>
+      </div>
+
+      <!-- Vista: Notas Personales -->
+      <div class="view" id="view-notas">
+        <div id="notas-content"></div>
+      </div>
+
+      <!-- Vista: Perfil -->
+      <div class="view" id="view-perfil">
+        <div id="perfil-content"></div>
       </div>
 
     </div><!-- /content-area -->
@@ -365,6 +378,42 @@
 </div>
 
 
+<!-- Modal: Crear / Editar nota -->
+<div class="modal-overlay" id="modal-nota">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-nota-title">Nueva nota</div>
+      <button class="modal-close" onclick="closeModal('modal-nota')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Título *</label>
+        <input type="text" class="form-input" id="n-titulo" placeholder="Título de la nota">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contenido</label>
+        <textarea class="form-textarea" id="n-contenido" placeholder="Escribe aquí tu nota..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Etiqueta</label>
+        <select class="form-select" id="n-etiqueta">
+          <option value="">— Sin etiqueta —</option>
+          <option value="clase">📚 Clase</option>
+          <option value="examen">✏️ Examen</option>
+          <option value="proyecto">🗂 Proyecto</option>
+          <option value="personal">🙋 Personal</option>
+          <option value="idea">💡 Idea</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-nota')">Cancelar</button>
+      <button class="btn-action"    onclick="ModNotas.save()">💾 Guardar nota</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- ═══════════════════════════════════════════════════
   JS MODULES  (orden de carga importa)
 ═══════════════════════════════════════════════════ -->
@@ -374,6 +423,8 @@
 <script src="js/views/inicio.js"></script>
 <script src="js/views/tareas.js"></script>
 <script src="js/views/views.js"></script>
+<script src="js/views/notas.js"></script>
+<script src="js/views/perfil.js"></script>
 <script src="js/router.js"></script>
 <script src="js/app.js"></script>
 

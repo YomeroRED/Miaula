@@ -25,18 +25,20 @@ const App = {
     // ── Sidebar: items de navegación ──
     const navItems = isDocente
       ? [
-          { id: 'inicio',         label: 'Inicio',        icon: '🏠' },
+          { id: 'inicio',         label: 'Inicio',         icon: '🏠' },
           { id: 'tareas',         label: 'Tareas',         icon: '✅' },
           { id: 'recursos',       label: 'Recursos',       icon: '📁' },
           { id: 'calificaciones', label: 'Calificaciones', icon: '📊' },
           { id: 'alumnos',        label: 'Alumnos',        icon: '🎓' },
+          { id: 'notas',          label: 'Mis notas',      icon: '📝' },
           { id: 'mensajes',       label: 'Mensajes',       icon: '💬', badge: this._unreadCount() },
         ]
       : [
           { id: 'inicio',         label: 'Inicio',         icon: '🏠' },
           { id: 'tareas',         label: 'Tareas',         icon: '✅', badge: pendingCount(this.currentUser.id) },
           { id: 'recursos',       label: 'Recursos',       icon: '📁' },
-          { id: 'calificaciones', label: 'Mis notas',      icon: '📊' },
+          { id: 'calificaciones', label: 'Calificaciones', icon: '📊' },
+          { id: 'notas',          label: 'Mis notas',      icon: '📝' },
           { id: 'mensajes',       label: 'Mensajes',       icon: '💬' },
         ];
 
@@ -56,6 +58,12 @@ const App = {
       nav.appendChild(el);
     });
 
+    // ── Engranaje de perfil (anclado al fondo) ──
+    const gear = document.getElementById('sidebar-gear');
+    gear.className = 'nav-item nav-gear' + (this.currentView === 'perfil' ? ' active' : '');
+    gear.innerHTML = '<span class="nav-icon">⚙️</span> Configuración';
+    gear.onclick = () => App.navigateTo('perfil');
+
     this.navigateTo('inicio');
   },
 
@@ -67,7 +75,6 @@ const App = {
     document.querySelectorAll('.nav-item').forEach(el =>
       el.classList.toggle('active', el.dataset.view === viewId)
     );
-
     // Mostrar vista correspondiente
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     const viewEl = document.getElementById('view-' + viewId);
@@ -81,6 +88,8 @@ const App = {
       calificaciones: 'Calificaciones',
       mensajes:       'Mensajes',
       alumnos:        'Alumnos',
+      notas:          'Mis Notas',
+      perfil:         'Mi Perfil',
     };
     document.getElementById('page-heading').textContent = titles[viewId] || viewId;
 
@@ -102,6 +111,9 @@ const App = {
     }
     if (viewId === 'recursos' && isDocente) {
       this._addTopbarBtn(container, '📁 Agregar recurso', () => openModal('modal-recurso'));
+    }
+    if (viewId === 'notas') {
+      this._addTopbarBtn(container, '📝 Nueva nota', () => ModNotas.openModal());
     }
   },
 

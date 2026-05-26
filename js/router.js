@@ -16,6 +16,8 @@ const Views = {
       case 'calificaciones': ViewCalificaciones.render(); break;
       case 'mensajes':       ViewMensajes.render();       break;
       case 'alumnos':        ViewAlumnos.render();        break;
+      case 'notas':          ViewNotas.render();          break;
+      case 'perfil':         ViewPerfil.render();         break;
       default:
         console.warn(`[Router] Vista desconocida: "${viewId}"`);
     }
