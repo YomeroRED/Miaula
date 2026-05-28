@@ -84,9 +84,14 @@ function loginUser(user) {
   // Mostrar app
   document.getElementById('app-screen').classList.add('active');
 
-  // Limpiar campos
+  // Limpiar campos del formulario
   document.getElementById('login-email').value = '';
   document.getElementById('login-pass').value  = '';
+  document.getElementById('reg-name').value    = '';
+  document.getElementById('reg-email').value   = '';
+  document.getElementById('reg-pass').value    = '';
+  hideError('login-error');
+  hideError('reg-error');
 
   // Inicializar app
   App.setup();
@@ -94,9 +99,18 @@ function loginUser(user) {
 
 /** Cierra sesión y regresa a la pantalla de auth */
 function logout() {
+  // Limpiar estado de la app
   App.currentUser = null;
   App.currentView = 'inicio';
+  ViewMensajes.activeContact = null;
+  ModTareas.activeTab = 'todas';
 
+  // Ocultar app
   document.getElementById('app-screen').classList.remove('active');
+
+  // Restaurar pantalla de auth (el bug: esto faltaba)
+  document.getElementById('auth-screen').style.display = '';
+
+  // Regresar al panel de login (por si quedó en registro)
   document.getElementById('authContainer').classList.remove('active');
 }
