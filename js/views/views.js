@@ -23,7 +23,7 @@ const ViewRecursos = {
   _card(r, i, isDocente) {
     const bg = this.COLORS[i % this.COLORS.length];
     const delBtn = isDocente
-      ? `<button class="btn-danger btn-sm" onclick="ViewRecursos.eliminar(${r.id})">🗑</button>`
+      ? `<button class="btn-danger btn-sm" onclick="ViewRecursos.eliminar(${r.id})" style="background:#D93025;color:#fff;border-color:#D93025">🗑 Eliminar</button>`
       : '';
     return `
       <div class="resource-card fade-up">
@@ -34,36 +34,39 @@ const ViewRecursos = {
           ${r.desc ? `<div class="resource-desc">${r.desc}</div>` : ''}
         </div>
         <div class="resource-actions">
-          <button class="btn-secondary btn-sm">⬇ Descargar</button>
+          <button class="btn-sm" style="background:#0F9B6E;color:#fff;border:1px solid #0F9B6E;border-radius:var(--radius);padding:6px 12px;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">⬇ Descargar</button>
           ${delBtn}
         </div>
       </div>`;
   },
 
-  eliminar(id) {
+  async eliminar(id) {
     if (!confirm('¿Eliminar este recurso?')) return;
-    DB.recursos = DB.recursos.filter(r => r.id !== id);
-    this.render();
+    try {
+      await apiCall('delete_recurso', { id });
+      DB.recursos = DB.recursos.filter(r => r.id !== id);
+      this.render();
+    } catch(err) { alert(err.message); }
   },
 };
 
 /** Guarda nuevo recurso desde el modal */
-function saveRecurso() {
+async function saveRecurso() {
   const nombre = fieldVal('r-nombre');
   if (!nombre) { alert('El nombre es requerido.'); return; }
-
-  DB.recursos.push({
-    id:        DB.nextId.recursos++,
+  const recurso = {
     nombre,
     materia:   fieldVal('r-materia'),
     tipo:      document.getElementById('r-tipo').value,
     desc:      fieldVal('r-desc'),
     docenteId: App.currentUser.id,
-    fecha:     new Date().toISOString().slice(0, 10),
-  });
-
-  closeModal('modal-recurso');
-  ViewRecursos.render();
+  };
+  try {
+    const res = await apiCall('save_recurso', { recurso });
+    DB.recursos.push({ ...recurso, id: res.id, fecha: new Date().toISOString().slice(0,10) });
+    closeModal('modal-recurso');
+    ViewRecursos.render();
+  } catch(err) { alert(err.message); }
 }
 
 
@@ -156,35 +159,71 @@ const ViewCalificaciones = {
 
 const ViewMensajes = {
   activeContact: null,
+  _unreadContacts: new Set(),
 
   render() {
     this._renderContactList();
     if (this.activeContact) this._renderChat(this.activeContact);
   },
 
+  _isUnread(contactId) {
+    return this._unreadContacts.has(contactId);
+  },
+
+  _markUnread(contactId) {
+    this._unreadContacts.add(contactId);
+  },
+
+  _clearUnread(contactId) {
+    this._unreadContacts.delete(contactId);
+  },
+
   _renderContactList() {
-    const contacts = DB.users.filter(u => u.id !== App.currentUser.id);
+    const uid      = App.currentUser.id;
+    const contacts = DB.users.filter(u => u.id !== uid);
     const el       = document.getElementById('msg-contacts');
 
-    el.innerHTML = contacts.map(c => {
-      const key  = [App.currentUser.id, c.id].sort().join('-');
-      const msgs = DB.mensajes[key] || [];
-      const last = msgs[msgs.length - 1];
+    // Sort: unread first, then by last message recency
+    const sorted = [...contacts].sort((a, b) => {
+      const aUnread = this._isUnread(a.id) ? 1 : 0;
+      const bUnread = this._isUnread(b.id) ? 1 : 0;
+      if (bUnread !== aUnread) return bUnread - aUnread;
+      const keyA  = [uid, a.id].sort().join('-');
+      const keyB  = [uid, b.id].sort().join('-');
+      const msgsA = DB.mensajes[keyA] || [];
+      const msgsB = DB.mensajes[keyB] || [];
+      const lastA = msgsA[msgsA.length - 1];
+      const lastB = msgsB[msgsB.length - 1];
+      if (!lastA && !lastB) return 0;
+      if (!lastA) return 1;
+      if (!lastB) return -1;
+      return lastB.hora > lastA.hora ? 1 : -1;
+    });
+
+    el.innerHTML = sorted.map(c => {
+      const key      = [uid, c.id].sort().join('-');
+      const msgs     = DB.mensajes[key] || [];
+      const last     = msgs[msgs.length - 1];
       const isActive = this.activeContact === c.id;
+      const unread   = this._isUnread(c.id);
 
       return `
-        <div class="msg-item ${isActive ? 'active' : ''}" onclick="ViewMensajes.selectContact(${c.id})">
+        <div class="msg-item ${isActive ? 'active' : ''} ${unread ? 'msg-unread' : ''}" onclick="ViewMensajes.selectContact(${c.id})">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div class="msg-item-name">${c.name}</div>
-            <div class="msg-item-time">${last ? last.hora : ''}</div>
+            <div class="msg-item-name" ${unread ? 'style="font-weight:700;color:var(--brand)"' : ''}>${c.name}</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div class="msg-item-time">${last ? last.hora : ''}</div>
+              ${unread ? '<span class="msg-unread-dot"></span>' : ''}
+            </div>
           </div>
-          <div class="msg-item-preview">${last ? last.text : 'Sin mensajes aún'}</div>
+          <div class="msg-item-preview" ${unread ? 'style="color:var(--text);font-weight:500"' : ''}>${last ? last.text : 'Sin mensajes aún'}</div>
         </div>`;
     }).join('');
   },
 
   selectContact(id) {
     this.activeContact = id;
+    this._clearUnread(id);
     this._renderContactList();
     this._renderChat(id);
   },
@@ -211,24 +250,42 @@ const ViewMensajes = {
     body.scrollTop = body.scrollHeight;
   },
 
-  send() {
+  // Called when a new incoming message arrives from another user
+  receiveMessage(fromId, text, hora) {
+    const uid = App.currentUser.id;
+    const key = [uid, fromId].sort((a, b) => a - b).join('-');
+    if (!DB.mensajes[key]) DB.mensajes[key] = [];
+    DB.mensajes[key].push({ from: fromId, text, hora });
+    if (this.activeContact !== fromId) {
+      this._markUnread(fromId);
+    }
+    this._renderContactList();
+    if (this.activeContact === fromId) {
+      this._renderChat(fromId);
+    }
+  },
+
+  async send() {
     if (!this.activeContact) return;
     const input = document.getElementById('msg-input');
     const text  = input.value.trim();
     if (!text) return;
-
-    const key = [App.currentUser.id, this.activeContact].sort().join('-');
-    if (!DB.mensajes[key]) DB.mensajes[key] = [];
-
-    const hora = new Date().toTimeString().slice(0, 5);
-    DB.mensajes[key].push({ from: App.currentUser.id, text, hora });
     input.value = '';
 
-    this._renderContactList();
-    this._renderChat(this.activeContact);
+    const fromId = App.currentUser.id;
+    const toId   = this.activeContact;
+    const key    = [fromId, toId].sort((a,b)=>a-b).join('-');
+
+    try {
+      const res = await apiCall('send_mensaje', { fromId, toId, text });
+      if (!DB.mensajes[key]) DB.mensajes[key] = [];
+      DB.mensajes[key].push({ from: fromId, text, hora: res.hora });
+      this._renderContactList();
+      this._renderChat(toId);
+      if (typeof App !== 'undefined') App.markMessagesRead();
+    } catch(err) { console.error(err); }
   },
 };
-
 
 /* ═══════════════════════════════════════
    MiAula — views/alumnos.js

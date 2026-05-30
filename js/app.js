@@ -1,19 +1,52 @@
 /* ═══════════════════════════════════════
    MiAula — app.js
    Núcleo de la aplicación: navegación, sidebar, topbar
+   (solo en app.html — la sesión ya fue validada por auth-guard.js)
 ═══════════════════════════════════════ */
 
 const App = {
   currentUser: null,
   currentView: 'inicio',
 
-  /** Configurar la app después del login */
+  /** Inicializar la app al cargar la página */
+  async init() {
+    // auth-guard.js ya garantiza que __miaulaUser existe
+    this.currentUser = window.__miaulaUser;
+
+    // Spinner superpuesto — no destruye las vistas del DOM
+    const _spin = document.createElement('div');
+    _spin.style.cssText = 'position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(255,255,255,.75);font-size:18px;color:#666;z-index:999';
+    _spin.textContent = '⏳ Cargando datos...';
+    document.body.appendChild(_spin);
+
+    try {
+      await DB.load(this.currentUser.id);
+    } catch (err) {
+      console.error('[DB.load error]', err.message || err);
+      // Mostrar error visible en pantalla para diagnóstico
+      const errBox = document.createElement('div');
+      errBox.style.cssText = 'position:fixed;top:10px;right:10px;background:#fee;border:1px solid #f00;padding:12px 16px;border-radius:8px;font-size:13px;z-index:9999;max-width:400px;word-break:break-all';
+      errBox.innerHTML = '<b>Error al conectar con la BD:</b><br>' + (err.message || err);
+      document.body.appendChild(errBox);
+      setTimeout(() => errBox.remove(), 15000);
+    }
+
+    _spin.remove();
+    this.setup();
+  },
+
+  /** Configurar sidebar y navegar a inicio */
   setup() {
     const isDocente = this.currentUser.role === 'docente';
 
-    // ── Sidebar: datos del usuario ──
     const av = document.getElementById('sidebar-avatar');
-    av.textContent = initials(this.currentUser.name);
+    const _savedPhoto = localStorage.getItem('miaula_avatar_' + this.currentUser.id);
+    if (_savedPhoto) {
+      av.innerHTML = `<img src="${_savedPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      av.style.padding = '0';
+    } else {
+      av.textContent = initials(this.currentUser.name);
+    }
 
     document.getElementById('sidebar-uname').textContent = this.currentUser.name;
     document.getElementById('sidebar-urole').textContent = isDocente ? 'Docente' : 'Alumno';
@@ -22,7 +55,6 @@ const App = {
     rt.textContent = isDocente ? 'Docente' : 'Alumno';
     rt.className   = 'sidebar-role-tag ' + (isDocente ? 'tag-docente' : 'tag-alumno');
 
-    // ── Sidebar: items de navegación ──
     const navItems = isDocente
       ? [
           { id: 'inicio',         label: 'Inicio',         icon: '🏠' },
@@ -47,8 +79,8 @@ const App = {
 
     navItems.forEach(item => {
       const el = document.createElement('div');
-      el.className      = 'nav-item' + (item.id === this.currentView ? ' active' : '');
-      el.dataset.view   = item.id;
+      el.className    = 'nav-item' + (item.id === this.currentView ? ' active' : '');
+      el.dataset.view = item.id;
       el.innerHTML = `
         <span class="nav-icon">${item.icon}</span>
         ${item.label}
@@ -58,29 +90,24 @@ const App = {
       nav.appendChild(el);
     });
 
-    // ── Engranaje de perfil (anclado al fondo) ──
     const gear = document.getElementById('sidebar-gear');
     gear.className = 'nav-item nav-gear' + (this.currentView === 'perfil' ? ' active' : '');
     gear.innerHTML = '<span class="nav-icon">⚙️</span> Configuración';
-    gear.onclick = () => App.navigateTo('perfil');
+    gear.onclick   = () => App.navigateTo('perfil');
 
     this.navigateTo('inicio');
   },
 
-  /** Navegar a una vista */
   navigateTo(viewId) {
     this.currentView = viewId;
 
-    // Activar nav item
     document.querySelectorAll('.nav-item').forEach(el =>
       el.classList.toggle('active', el.dataset.view === viewId)
     );
-    // Mostrar vista correspondiente
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     const viewEl = document.getElementById('view-' + viewId);
     if (viewEl) viewEl.classList.add('active');
 
-    // Heading
     const titles = {
       inicio:         'Inicio',
       tareas:         'Tareas',
@@ -91,30 +118,28 @@ const App = {
       notas:          'Mis Notas',
       perfil:         'Mi Perfil',
     };
-    document.getElementById('page-heading').textContent = titles[viewId] || viewId;
+    const heading = document.getElementById('page-heading');
+    if (heading) heading.textContent = titles[viewId] || viewId;
 
-    // Botones del topbar
     this._renderTopbarActions(viewId);
-
-    // Renderizar contenido de la vista
-    Views.render(viewId);
+    if (typeof Views !== 'undefined') Views.render(viewId);
+    if (viewId === 'mensajes') {
+      this.markMessagesRead();
+      // If a contact is already active, clear its unread indicator
+      if (typeof ViewMensajes !== 'undefined' && ViewMensajes.activeContact) {
+        ViewMensajes._clearUnread(ViewMensajes.activeContact);
+        ViewMensajes._renderContactList();
+      }
+    }
   },
 
-  /** Botones de acción en el topbar según vista y rol */
   _renderTopbarActions(viewId) {
-    const container   = document.getElementById('topbar-actions');
+    const container = document.getElementById('topbar-actions');
     container.innerHTML = '';
-    const isDocente   = this.currentUser.role === 'docente';
+    const isDocente = this.currentUser.role === 'docente';
 
-    if (viewId === 'tareas' && isDocente) {
-      this._addTopbarBtn(container, '➕ Nueva tarea', () => ModTareas.openModal());
-    }
-    if (viewId === 'recursos' && isDocente) {
-      this._addTopbarBtn(container, '📁 Agregar recurso', () => openModal('modal-recurso'));
-    }
-    if (viewId === 'notas') {
-      this._addTopbarBtn(container, '📝 Nueva nota', () => ModNotas.openModal());
-    }
+    if (viewId === 'tareas' && isDocente)  this._addTopbarBtn(container, '➕ Nueva tarea',     () => ModTareas.openModal());
+    if (viewId === 'recursos' && isDocente) this._addTopbarBtn(container, '📁 Agregar recurso', () => openModal('modal-recurso'));
   },
 
   _addTopbarBtn(container, label, fn) {
@@ -125,8 +150,39 @@ const App = {
     container.appendChild(btn);
   },
 
-  /** Mensajes no leídos (simplificado) */
   _unreadCount() {
-    return 1;
+    const uid = this.currentUser.id;
+    const seenKey = 'miaula_seen_' + uid;
+    const seen = JSON.parse(localStorage.getItem(seenKey) || '{}');
+    let count = 0;
+    for (const [key, msgs] of Object.entries(DB.mensajes || {})) {
+      const ids = key.split('-').map(Number);
+      if (!ids.includes(uid)) continue;
+      const lastMsg = msgs[msgs.length - 1];
+      if (!lastMsg) continue;
+      // No contar mensajes enviados por el usuario mismo
+      if (lastMsg.from === uid) continue;
+      const seenHora = seen[key];
+      if (!seenHora || seenHora !== lastMsg.hora + '|' + msgs.length) count++;
+    }
+    return count || 0;
+  },
+
+  /** Llama esto cuando el usuario abre mensajes para marcarlos como leídos */
+  markMessagesRead() {
+    const uid = this.currentUser.id;
+    const seenKey = 'miaula_seen_' + uid;
+    const seen = {};
+    for (const [key, msgs] of Object.entries(DB.mensajes || {})) {
+      const lastMsg = msgs[msgs.length - 1];
+      if (lastMsg) seen[key] = lastMsg.hora + '|' + msgs.length;
+    }
+    localStorage.setItem(seenKey, JSON.stringify(seen));
+    // Actualizar badge en sidebar
+    const badge = document.querySelector('.nav-item[data-view="mensajes"] .nav-badge');
+    if (badge) badge.remove();
   },
 };
+
+/* ── Arrancar la app cuando el DOM esté listo ── */
+document.addEventListener('DOMContentLoaded', () => App.init());

@@ -33,9 +33,23 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   padding: 48px 44px;
   transition: all 0.65s cubic-bezier(0.68, -0.4, 0.27, 1.35);
+  background: var(--surface);
+}
+
+/* ── Tarjeta que envuelve el formulario ── */
+.auth-form-card {
+  width: 100%;
+  max-width: 400px;
   background: var(--white);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+  padding: 40px 36px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .login-panel {
@@ -122,6 +136,7 @@
   align-items: flex-start;
   padding: 52px 44px;
   position: relative;
+  text-align: left;
 }
 
 .overlay-face::before {
@@ -311,10 +326,15 @@
   .auth-panel {
     width: 100%;
     position: relative;
-    padding: 40px 24px 32px;
+    padding: 24px 16px 28px;
     transform: none !important;
     opacity: 1 !important;
     pointer-events: all !important;
+    background: var(--surface);
+  }
+  .auth-form-card {
+    padding: 28px 22px 24px;
+    border-radius: 14px;
   }
   .login-panel {
     display: flex;

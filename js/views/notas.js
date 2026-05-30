@@ -24,6 +24,7 @@ const ViewNotas = {
             oninput="ViewNotas._onSearch(this.value)"
           >
         </div>
+        <button class="btn-action" style="margin-top:10px;align-self:flex-start" onclick="ModNotas.openModal()">📝 Nueva nota</button>
         <div class="notas-filtros" id="notas-filtros">
           ${this._filtrosBtns()}
         </div>
@@ -143,18 +144,23 @@ const ViewNotas = {
       </div>`;
   },
 
-  togglePin(id) {
+  async togglePin(id) {
     const nota = (DB.notas || []).find(n => n.id === id);
     if (!nota) return;
-    nota.fijada = !nota.fijada;
-    this._renderGrid();
+    try {
+      await apiCall('toggle_pin', { id });
+      nota.fijada = !nota.fijada;
+      this._renderGrid();
+    } catch(err) { alert(err.message); }
   },
 
-  eliminar(id) {
+  async eliminar(id) {
     if (!confirm('¿Eliminar esta nota?')) return;
-    DB.notas = (DB.notas || []).filter(n => n.id !== id);
-    this.render();
-    App.setup(); // refresca badge si lo hubiera
+    try {
+      await apiCall('delete_nota', { id });
+      DB.notas = (DB.notas || []).filter(n => n.id !== id);
+      this.render();
+    } catch(err) { alert(err.message); }
   },
 
   editar(id) {
@@ -181,7 +187,7 @@ const ModNotas = {
     document.getElementById('n-titulo').focus();
   },
 
-  save() {
+  async save() {
     const titulo    = fieldVal('n-titulo');
     const contenido = (document.getElementById('n-contenido').value || '').trim();
     const etiqueta  = document.getElementById('n-etiqueta').value || '';
@@ -191,29 +197,19 @@ const ModNotas = {
     const hoy = new Date().toISOString().slice(0, 10);
 
     if (!DB.notas) DB.notas = [];
+    const notaData = { titulo, contenido, etiqueta, autorId: App.currentUser.id };
+    if (this._editId) notaData.id = this._editId;
 
-    if (this._editId) {
-      const nota = DB.notas.find(n => n.id === this._editId);
-      if (nota) {
-        nota.titulo    = titulo;
-        nota.contenido = contenido;
-        nota.etiqueta  = etiqueta;
-        nota.fechaMod  = hoy;
+    try {
+      const res = await apiCall('save_nota', { nota: notaData });
+      if (this._editId) {
+        const nota = DB.notas.find(n => n.id === this._editId);
+        if (nota) Object.assign(nota, { titulo, contenido, etiqueta, fechaMod: hoy });
+      } else {
+        DB.notas.push({ ...notaData, id: res.id, fecha: hoy, fechaMod: hoy, fijada: false });
       }
-    } else {
-      DB.notas.push({
-        id:        (DB.nextId.notas = (DB.nextId.notas || 1) + 1, DB.nextId.notas - 1),
-        titulo,
-        contenido,
-        etiqueta,
-        autorId:   App.currentUser.id,
-        fecha:     hoy,
-        fechaMod:  hoy,
-        fijada:    false,
-      });
-    }
-
-    closeModal('modal-nota');
-    ViewNotas.render();
+      closeModal('modal-nota');
+      ViewNotas.render();
+    } catch(err) { alert(err.message); }
   },
 };

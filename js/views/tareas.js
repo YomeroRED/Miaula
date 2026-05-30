@@ -179,11 +179,14 @@ const ViewTareas = {
       </table>`;
   },
 
-  eliminar(id) {
+  async eliminar(id) {
     if (!confirm('¿Eliminar esta tarea? Las entregas asociadas también se eliminarán.')) return;
-    DB.tareas   = DB.tareas.filter(t => t.id !== id);
-    DB.entregas = DB.entregas.filter(e => e.tareaId !== id);
-    this.render();
+    try {
+      await apiCall('delete_tarea', { id });
+      DB.tareas   = DB.tareas.filter(t => t.id !== id);
+      DB.entregas = DB.entregas.filter(e => e.tareaId !== id);
+      this.render();
+    } catch(err) { alert(err.message); }
   },
 };
 
@@ -206,7 +209,7 @@ ModTareas.openModal = function(id) {
   openModal('modal-tarea');
 };
 
-ModTareas.save = function() {
+ModTareas.save = async function() {
   const titulo  = fieldVal('t-titulo');
   const materia = fieldVal('t-materia');
   const fecha   = fieldVal('t-fecha');
@@ -214,20 +217,20 @@ ModTareas.save = function() {
 
   const desc   = fieldVal('t-desc');
   const puntos = parseInt(document.getElementById('t-puntos').value) || 100;
+  const tarea  = { titulo, desc, materia, fecha, puntos, docenteId: App.currentUser.id };
+  if (ModTareas.editingId) tarea.id = ModTareas.editingId;
 
-  if (ModTareas.editingId) {
-    const t = DB.tareas.find(t => t.id === ModTareas.editingId);
-    if (t) Object.assign(t, { titulo, desc, materia, fecha, puntos });
-  } else {
-    DB.tareas.push({
-      id: DB.nextId.tareas++,
-      titulo, desc, materia, fecha, puntos,
-      docenteId: App.currentUser.id,
-    });
-  }
-
-  closeModal('modal-tarea');
-  ViewTareas.render();
+  try {
+    const res = await apiCall('save_tarea', { tarea });
+    if (ModTareas.editingId) {
+      const t = DB.tareas.find(t => t.id === ModTareas.editingId);
+      if (t) Object.assign(t, { titulo, desc, materia, fecha, puntos });
+    } else {
+      DB.tareas.push({ id: res.id, titulo, desc, materia, fecha, puntos, docenteId: App.currentUser.id });
+    }
+    closeModal('modal-tarea');
+    ViewTareas.render();
+  } catch(err) { alert(err.message); }
 };
 
 // ── Modal: Entregar tarea (alumno) ─────
@@ -241,30 +244,25 @@ const ModEntrega = {
     openModal('modal-entrega');
   },
 
-  confirm() {
+  async confirm() {
     const comentario = fieldVal('e-comentario');
     const tareaId    = ModTareas.entregaTareaId;
     const alumnoId   = App.currentUser.id;
 
-    if (DB.entregas.find(e => e.tareaId === tareaId && e.alumnoId === alumnoId)) {
-      alert('Ya entregaste esta tarea.');
+    try {
+      const res = await apiCall('save_entrega', { entrega: { tareaId, alumnoId, comentario } });
+      DB.entregas.push({
+        id: res.id, tareaId, alumnoId, comentario,
+        fecha: new Date().toISOString().slice(0, 10),
+        calificacion: null, feedback: null,
+      });
       closeModal('modal-entrega');
-      return;
+      ViewTareas.render();
+      App.setup();
+    } catch(err) {
+      alert(err.message);
+      closeModal('modal-entrega');
     }
-
-    DB.entregas.push({
-      id:          DB.nextId.entregas++,
-      tareaId,
-      alumnoId,
-      comentario,
-      fecha:       new Date().toISOString().slice(0, 10),
-      calificacion: null,
-      feedback:    null,
-    });
-
-    closeModal('modal-entrega');
-    ViewTareas.render();
-    App.setup(); // refresca badge
   },
 };
 
@@ -286,7 +284,7 @@ const ModCalificar = {
     openModal('modal-calificar');
   },
 
-  save() {
+  async save() {
     const nota = parseInt(document.getElementById('cal-nota').value);
     const max  = parseInt(document.getElementById('cal-max').value) || 100;
 
@@ -296,10 +294,12 @@ const ModCalificar = {
     }
 
     const feedback = fieldVal('cal-feedback');
-    const e = DB.entregas.find(e => e.id === ModTareas.calificarEntId);
-    if (e) { e.calificacion = nota; e.feedback = feedback; }
-
-    closeModal('modal-calificar');
-    ViewTareas.render();
+    try {
+      await apiCall('calificar_entrega', { entregaId: ModTareas.calificarEntId, calificacion: nota, feedback });
+      const e = DB.entregas.find(e => e.id === ModTareas.calificarEntId);
+      if (e) { e.calificacion = nota; e.feedback = feedback; }
+      closeModal('modal-calificar');
+      ViewTareas.render();
+    } catch(err) { alert(err.message); }
   },
 };

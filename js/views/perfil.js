@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════
    MiAula — views/perfil.js
-   Módulo de Perfil Editable
+   Módulo de Perfil (conectado a MySQL)
 ═══════════════════════════════════════ */
 
 const ViewPerfil = {
@@ -32,13 +32,18 @@ const ViewPerfil = {
 
         <!-- Columna izquierda: avatar + stats -->
         <div class="perfil-sidebar">
-          <div class="perfil-avatar-wrap">
+          <div class="perfil-avatar-wrap" style="position:relative;display:inline-block">
             <div class="perfil-avatar" id="perfil-avatar-circle"
-                 style="background:${roleColor}">
-              ${initials(user.name)}
+                 style="background:${roleColor};overflow:hidden;cursor:pointer"
+                 onclick="document.getElementById('avatar-file-input').click()"
+                 title="Cambiar foto de perfil">
+              ${ViewPerfil._getAvatarContent(user)}
             </div>
-            <button class="perfil-avatar-edit" onclick="ViewPerfil._focusNombre()"
-                    title="Editar nombre">✏️</button>
+            <button class="perfil-avatar-edit"
+                    onclick="document.getElementById('avatar-file-input').click()"
+                    title="Cambiar foto de perfil" style="cursor:pointer">📷</button>
+            <input type="file" id="avatar-file-input" accept="image/*"
+                   style="display:none" onchange="ViewPerfil._onAvatarChange(event)">
           </div>
 
           <div class="perfil-name" id="perfil-display-name">${user.name}</div>
@@ -75,7 +80,7 @@ const ViewPerfil = {
           <div class="perfil-section">
             <div class="perfil-section-title">Información personal</div>
 
-            <div class="error-msg" id="perfil-error" style="display:none"></div>
+            <div class="error-msg"    id="perfil-error"   style="display:none"></div>
             <div class="perfil-success" id="perfil-success" style="display:none"></div>
 
             <div class="form-group">
@@ -91,7 +96,7 @@ const ViewPerfil = {
                      placeholder="correo@ejemplo.com">
             </div>
 
-            <button class="btn-action perfil-save-btn"
+            <button class="btn-action perfil-save-btn" id="perfil-datos-btn"
                     onclick="ViewPerfil.guardarDatos()">
               💾 Guardar cambios
             </button>
@@ -101,8 +106,8 @@ const ViewPerfil = {
           <div class="perfil-section">
             <div class="perfil-section-title">Cambiar contraseña</div>
 
-            <div class="error-msg"   id="perfil-pass-error"   style="display:none"></div>
-            <div class="perfil-success" id="perfil-pass-ok"   style="display:none"></div>
+            <div class="error-msg"    id="perfil-pass-error" style="display:none"></div>
+            <div class="perfil-success" id="perfil-pass-ok"  style="display:none"></div>
 
             <div class="form-group">
               <label class="form-label">Contraseña actual</label>
@@ -131,7 +136,7 @@ const ViewPerfil = {
               </div>
             </div>
 
-            <button class="btn-secondary perfil-save-btn"
+            <button class="btn-secondary perfil-save-btn" id="perfil-pass-btn"
                     onclick="ViewPerfil.cambiarPassword()">
               🔒 Actualizar contraseña
             </button>
@@ -142,102 +147,143 @@ const ViewPerfil = {
     `;
   },
 
-  /** Guarda nombre y correo */
-  guardarDatos() {
+  /** Guarda nombre y correo en MySQL */
+  async guardarDatos() {
     const nombre = fieldVal('perfil-nombre');
     const email  = fieldVal('perfil-email');
-    const errEl  = document.getElementById('perfil-error');
-    const okEl   = document.getElementById('perfil-success');
 
-    errEl.style.display = 'none';
-    okEl.style.display  = 'none';
+    document.getElementById('perfil-error').style.display   = 'none';
+    document.getElementById('perfil-success').style.display = 'none';
 
-    if (!nombre) {
-      showError('perfil-error', 'El nombre no puede estar vacío.');
-      return;
-    }
-    if (!email || !email.includes('@')) {
-      showError('perfil-error', 'Ingresa un correo válido.');
-      return;
+    if (!nombre) { showError('perfil-error', 'El nombre no puede estar vacío.'); return; }
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      showError('perfil-error', 'Ingresa un correo válido.'); return;
     }
 
-    // Verificar que el correo no lo use otro usuario
-    const duplicado = DB.users.find(u => u.email === email && u.id !== App.currentUser.id);
-    if (duplicado) {
-      showError('perfil-error', 'Ese correo ya está en uso por otra cuenta.');
-      return;
+    _setLoadingBtn('perfil-datos-btn', true, '💾 Guardar cambios');
+    try {
+      await apiCall('update_profile', { id: App.currentUser.id, name: nombre, email });
+
+      // Actualizar estado local y sessionStorage
+      App.currentUser.name  = nombre;
+      App.currentUser.email = email;
+      sessionStorage.setItem('miaula_user', JSON.stringify(App.currentUser));
+
+      // Refrescar sidebar
+      document.getElementById('sidebar-uname').textContent         = nombre;
+      document.getElementById('sidebar-avatar').textContent        = initials(nombre);
+      document.getElementById('perfil-display-name').textContent   = nombre;
+      document.getElementById('perfil-avatar-circle').textContent  = initials(nombre);
+
+      const ok = document.getElementById('perfil-success');
+      ok.textContent   = '✅ Datos actualizados correctamente.';
+      ok.style.display = 'block';
+      setTimeout(() => { ok.style.display = 'none'; }, 3000);
+
+    } catch (err) {
+      showError('perfil-error', err.message);
+    } finally {
+      _setLoadingBtn('perfil-datos-btn', false, '💾 Guardar cambios');
     }
-
-    App.currentUser.name  = nombre;
-    App.currentUser.email = email;
-
-    // Refrescar sidebar con nuevo nombre
-    document.getElementById('sidebar-uname').textContent = nombre;
-    document.getElementById('sidebar-avatar').textContent = initials(nombre);
-    document.getElementById('perfil-display-name').textContent = nombre;
-    document.getElementById('perfil-avatar-circle').textContent = initials(nombre);
-
-    okEl.textContent    = '✅ Datos actualizados correctamente.';
-    okEl.style.display  = 'block';
-    setTimeout(() => { okEl.style.display = 'none'; }, 3000);
   },
 
-  /** Cambia la contraseña */
-  cambiarPassword() {
+  /** Cambia la contraseña verificando contra MySQL */
+  async cambiarPassword() {
     const actual   = document.getElementById('perfil-pass-actual').value;
     const nueva    = document.getElementById('perfil-pass-nueva').value;
     const confirma = document.getElementById('perfil-pass-confirm').value;
-    const errEl    = document.getElementById('perfil-pass-error');
-    const okEl     = document.getElementById('perfil-pass-ok');
 
-    errEl.style.display = 'none';
-    okEl.style.display  = 'none';
+    document.getElementById('perfil-pass-error').style.display = 'none';
+    document.getElementById('perfil-pass-ok').style.display    = 'none';
 
-    if (!actual) {
-      showError('perfil-pass-error', 'Ingresa tu contraseña actual.');
-      return;
-    }
-    if (actual !== App.currentUser.pass) {
-      showError('perfil-pass-error', 'La contraseña actual es incorrecta.');
-      return;
-    }
-    if (nueva.length < 6) {
-      showError('perfil-pass-error', 'La nueva contraseña debe tener al menos 6 caracteres.');
-      return;
-    }
-    if (nueva !== confirma) {
-      showError('perfil-pass-error', 'Las contraseñas no coinciden.');
-      return;
-    }
-    if (nueva === actual) {
-      showError('perfil-pass-error', 'La nueva contraseña debe ser diferente a la actual.');
-      return;
-    }
+    if (!actual) { showError('perfil-pass-error', 'Ingresa tu contraseña actual.'); return; }
+    if (nueva.length < 8) { showError('perfil-pass-error', 'La nueva contraseña debe tener al menos 8 caracteres.'); return; }
+    if (!/[A-Z]/.test(nueva)) { showError('perfil-pass-error', 'Debe incluir al menos una mayúscula.'); return; }
+    if (!/[0-9]/.test(nueva)) { showError('perfil-pass-error', 'Debe incluir al menos un número.'); return; }
+    if (nueva === actual) { showError('perfil-pass-error', 'La nueva contraseña no puede ser igual a la actual.'); return; }
+    if (nueva !== confirma) { showError('perfil-pass-error', 'Las contraseñas no coinciden.'); return; }
 
-    App.currentUser.pass = nueva;
+    _setLoadingBtn('perfil-pass-btn', true, '🔒 Actualizar contraseña');
+    try {
+      await apiCall('change_password', { id: App.currentUser.id, actual, nueva });
 
-    // Limpiar campos
-    document.getElementById('perfil-pass-actual').value  = '';
-    document.getElementById('perfil-pass-nueva').value   = '';
-    document.getElementById('perfil-pass-confirm').value = '';
+      // Limpiar campos
+      ['perfil-pass-actual','perfil-pass-nueva','perfil-pass-confirm']
+        .forEach(id => { document.getElementById(id).value = ''; });
 
-    okEl.textContent   = '✅ Contraseña actualizada correctamente.';
-    okEl.style.display = 'block';
-    setTimeout(() => { okEl.style.display = 'none'; }, 3000);
+      const ok = document.getElementById('perfil-pass-ok');
+      ok.textContent   = '✅ Contraseña actualizada correctamente.';
+      ok.style.display = 'block';
+      setTimeout(() => { ok.style.display = 'none'; }, 3000);
+
+    } catch (err) {
+      showError('perfil-pass-error', err.message);
+    } finally {
+      _setLoadingBtn('perfil-pass-btn', false, '🔒 Actualizar contraseña');
+    }
   },
 
-  /** Enfoca el campo nombre (desde el botón del avatar) */
   _focusNombre() {
     const el = document.getElementById('perfil-nombre');
     if (el) { el.focus(); el.select(); }
   },
 
-  /** Alterna visibilidad de campo contraseña */
+  /** Devuelve el contenido del avatar: foto o iniciales */
+  _getAvatarContent(user) {
+    const photo = localStorage.getItem('miaula_avatar_' + user.id);
+    if (photo) {
+      return `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    }
+    return initials(user.name);
+  },
+
+  /** Maneja la selección de imagen para el avatar */
+  _onAvatarChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('La imagen no debe superar 2 MB.'); return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      // Guardar en localStorage
+      localStorage.setItem('miaula_avatar_' + App.currentUser.id, dataUrl);
+      // Actualizar avatar en perfil
+      const circle = document.getElementById('perfil-avatar-circle');
+      if (circle) circle.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      // Actualizar avatar en sidebar
+      ViewPerfil._updateSidebarAvatar(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  },
+
+  /** Actualiza el avatar del sidebar */
+  _updateSidebarAvatar(dataUrl) {
+    const sidebarAv = document.getElementById('sidebar-avatar');
+    if (!sidebarAv) return;
+    if (dataUrl) {
+      sidebarAv.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      sidebarAv.style.padding = '0';
+    } else {
+      sidebarAv.innerHTML = initials(App.currentUser.name);
+      sidebarAv.style.padding = '';
+    }
+  },
+
   _togglePass(inputId, btn) {
     const input = document.getElementById(inputId);
     if (!input) return;
-    const show   = input.type === 'password';
-    input.type   = show ? 'text' : 'password';
+    const show      = input.type === 'password';
+    input.type      = show ? 'text' : 'password';
     btn.textContent = show ? '🙈' : '👁';
   },
 };
+
+/** Helper compartido: deshabilita un botón durante una petición */
+function _setLoadingBtn(btnId, loading, originalLabel) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled    = loading;
+  btn.textContent = loading ? 'Guardando...' : originalLabel;
+}

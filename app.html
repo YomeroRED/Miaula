@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiAula</title>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
+</head>
+<body>
+
+
+<div id="app-screen" class="active">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-brand">MiAula</div>
+      <span class="sidebar-role-tag" id="sidebar-role-tag">Rol</span>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-gear-wrap">
+      <div class="nav-item nav-gear" id="sidebar-gear" data-view="perfil"></div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar">U</div>
+      <div>
+        <div class="user-name" id="sidebar-uname">Usuario</div>
+        <div class="user-meta" id="sidebar-urole">Rol</div>
+      </div>
+      <button class="btn-logout" onclick="logout()" title="Cerrar sesión">↩</button>
+    </div>
+  </aside>
+
+  <div class="main-content" id="main-content">
+
+    <div class="topbar">
+      <div class="page-heading" id="page-heading">Inicio</div>
+      <div class="topbar-right" id="topbar-actions"></div>
+    </div>
+
+    <div class="content-area">
+
+      <div class="view active" id="view-inicio">
+        <div class="stats-grid" id="stats-grid"></div>
+        <div class="section-header">
+          <span class="section-title" id="home-section-title">Actividades recientes</span>
+        </div>
+        <div id="home-content"></div>
+      </div>
+
+      <div class="view" id="view-tareas">
+        <div class="tab-bar" id="tareas-tabs"></div>
+        <div id="tareas-content"></div>
+      </div>
+
+      <div class="view" id="view-recursos">
+        <div id="recursos-content"></div>
+      </div>
+
+      <div class="view" id="view-calificaciones">
+        <div id="calificaciones-content"></div>
+      </div>
+
+      <div class="view" id="view-mensajes">
+        <div class="msg-layout">
+          <div class="msg-list">
+            <div class="msg-list-header">Conversaciones</div>
+            <div id="msg-contacts"></div>
+          </div>
+          <div class="msg-main">
+            <div class="msg-topbar" id="msg-topbar">
+              <div class="user-avatar" id="msg-av"
+                   style="width:32px;height:32px;font-size:11px;flex-shrink:0">?</div>
+              <div>
+                <div class="msg-contact-name" id="msg-contact-name">Selecciona una conversación</div>
+                <div class="msg-contact-role" id="msg-contact-role"></div>
+              </div>
+            </div>
+            <div class="msg-body" id="msg-body"></div>
+            <div class="msg-input-bar">
+              <input class="msg-input" id="msg-input"
+                     placeholder="Escribe un mensaje..."
+                     onkeydown="if(event.key==='Enter') ViewMensajes.send()">
+              <button class="btn-action" onclick="ViewMensajes.send()">Enviar ↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="view-alumnos">
+        <div id="alumnos-content"></div>
+      </div>
+
+      <div class="view" id="view-notas">
+        <div id="notas-content"></div>
+      </div>
+
+      <div class="view" id="view-perfil">
+        <div id="perfil-content"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="modal-tarea">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-tarea-title">Nueva tarea</div>
+      <button class="modal-close" onclick="closeModal('modal-tarea')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Título *</label>
+        <input type="text" class="form-input" id="t-titulo" placeholder="Nombre de la tarea" maxlength="120">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-textarea" id="t-desc" placeholder="Instrucciones detalladas..." maxlength="2000"></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Materia *</label>
+          <input type="text" class="form-input" id="t-materia" placeholder="ej. Matemáticas III" maxlength="80">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de entrega *</label>
+          <input type="date" class="form-input" id="t-fecha">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Valor (puntos)</label>
+        <input type="number" class="form-input" id="t-puntos" placeholder="100" min="0" max="1000">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-tarea')">Cancelar</button>
+      <button class="btn-action" onclick="ModTareas.save()">💾 Guardar tarea</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-recurso">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Agregar recurso</div>
+      <button class="modal-close" onclick="closeModal('modal-recurso')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nombre del recurso *</label>
+        <input type="text" class="form-input" id="r-nombre" placeholder="ej. Presentación Unidad 3" maxlength="120">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Materia</label>
+        <input type="text" class="form-input" id="r-materia" placeholder="ej. Estadística" maxlength="80">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de recurso</label>
+        <select class="form-select" id="r-tipo">
+          <option value="📄 PDF">📄 PDF</option>
+          <option value="📊 Presentación">📊 Presentación</option>
+          <option value="🎥 Video">🎥 Video</option>
+          <option value="🔗 Enlace">🔗 Enlace</option>
+          <option value="📝 Documento">📝 Documento</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-textarea" id="r-desc"
+                  placeholder="Descripción breve del recurso..."
+                  style="min-height:70px" maxlength="500"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-recurso')">Cancelar</button>
+      <button class="btn-action" onclick="saveRecurso()">📁 Agregar recurso</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-entrega">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📤 Entregar tarea</div>
+      <button class="modal-close" onclick="closeModal('modal-entrega')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="entrega-info-box" id="entrega-tarea-info"></div>
+      <div class="form-group">
+        <label class="form-label">Comentarios / respuesta</label>
+        <textarea class="form-textarea" id="e-comentario"
+                  placeholder="Escribe tu respuesta o comentarios sobre la entrega..."
+                  maxlength="2000"></textarea>
+      </div>
+      <div class="adjunto-box">
+        <span class="adjunto-icon">📎</span>
+        <div>
+          <div class="adjunto-label">Adjuntar archivo</div>
+          <div class="adjunto-sub">Simulación — en versión real permite subir archivos</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-entrega')">Cancelar</button>
+      <button class="btn-success" onclick="ModEntrega.confirm()">✅ Confirmar entrega</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-calificar">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📊 Calificar entrega</div>
+      <button class="modal-close" onclick="closeModal('modal-calificar')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="entrega-info-box" id="cal-info"></div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Calificación *</label>
+          <input type="number" class="form-input" id="cal-nota" placeholder="0 – 100" min="0" max="1000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Puntos máximos</label>
+          <input type="text" class="form-input" id="cal-max" disabled>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Retroalimentación</label>
+        <textarea class="form-textarea" id="cal-feedback"
+                  placeholder="Comentarios y sugerencias para el alumno..."
+                  maxlength="1000"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-calificar')">Cancelar</button>
+      <button class="btn-action" onclick="ModCalificar.save()">💾 Guardar calificación</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-nota">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-nota-title">Nueva nota</div>
+      <button class="modal-close" onclick="closeModal('modal-nota')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Título *</label>
+        <input type="text" class="form-input" id="n-titulo" placeholder="Título de la nota" maxlength="120">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contenido</label>
+        <textarea class="form-textarea" id="n-contenido" placeholder="Escribe aquí tu nota..." maxlength="5000"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Etiqueta</label>
+        <select class="form-select" id="n-etiqueta">
+          <option value="">— Sin etiqueta —</option>
+          <option value="clase">📚 Clase</option>
+          <option value="examen">✏️ Examen</option>
+          <option value="proyecto">🗂 Proyecto</option>
+          <option value="personal">🙋 Personal</option>
+          <option value="idea">💡 Idea</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-nota')">Cancelar</button>
+      <button class="btn-action" onclick="ModNotas.save()">💾 Guardar nota</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/views/inicio.js"></script>
+<script src="js/views/tareas.js"></script>
+<script src="js/views/views.js"></script>
+<script src="js/views/notas.js"></script>
+<script src="js/views/perfil.js"></script>
+<script src="js/router.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
