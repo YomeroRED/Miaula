@@ -1,145 +1,48 @@
 /* ═══════════════════════════════════════
-   MiAula — Módulo Auth (Sliding Panel)
+   MiAula — Módulo Auth (Card centrada)
 ═══════════════════════════════════════ */
 
 #auth-screen {
   min-height: 100vh;
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: center;
   background: var(--surface);
-  padding: 0;
+  padding: 24px 16px;
 }
 
-/* ── Contenedor principal ── */
+/* ── Tarjeta principal centrada ── */
 .auth-container {
   position: relative;
-  width: 100vw;
-  max-width: 100%;
-  min-height: 100vh;
-  background: var(--white);
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-  display: flex;
-}
-
-/* ── Paneles de formulario ── */
-.auth-panel {
-  position: absolute;
-  top: 0;
-  width: 50%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 48px 44px;
-  transition: all 0.65s cubic-bezier(0.68, -0.4, 0.27, 1.35);
-  background: var(--surface);
-}
-
-/* ── Tarjeta que envuelve el formulario ── */
-.auth-form-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 900px;
+  min-height: 540px;
   background: var(--white);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
-  padding: 40px 36px 36px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.login-panel {
-  left: 0;
-  opacity: 1;
-  z-index: 2;
-  transform: translateX(0);
-}
-
-.register-panel {
-  left: 0;
-  opacity: 0;
-  z-index: 1;
-  transform: translateX(-30px);
-  pointer-events: none;
-}
-
-.auth-container.active .login-panel {
-  transform: translateX(30px);
-  opacity: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.auth-container.active .register-panel {
-  transform: translateX(100%);
-  opacity: 1;
-  z-index: 2;
-  pointer-events: all;
-}
-
-/* ── Títulos ── */
-.auth-title {
-  font-size: 26px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-.auth-sub {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 28px;
-}
-
-/* ── Contenedor del panel superpuesto ── */
-.overlay-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 50%;
-  height: 100%;
-  z-index: 10;
-  transition: transform 0.65s cubic-bezier(0.68, -0.4, 0.27, 1.35);
-  border-radius: 0;
+  border-radius: 24px;
   overflow: hidden;
-}
-
-.auth-container.active .overlay-container {
-  transform: translateX(-100%);
-  border-radius: 0;
-}
-
-/* ── Panel superpuesto interno ── */
-.overlay-panel {
-  position: relative;
-  width: 200%;
-  height: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.13), 0 4px 16px rgba(0,0,0,0.07);
   display: flex;
+  flex-direction: row;
+}
+
+/* ── Lado expositivo (izquierda) ── */
+.overlay-container {
+  position: relative;
+  width: 42%;
+  flex-shrink: 0;
   background: var(--navy);
-  transition: transform 0.65s cubic-bezier(0.68, -0.4, 0.27, 1.35);
-}
-
-.auth-container.active .overlay-panel {
-  transform: translateX(-50%);
-}
-
-/* ── Caras del overlay ── */
-.overlay-face {
-  width: 50%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   padding: 52px 44px;
-  position: relative;
-  text-align: left;
+  overflow: hidden;
+  transition: none;
+  border-radius: 0;
+  z-index: 1;
 }
 
-.overlay-face::before {
+.overlay-container::before {
   content: "";
   position: absolute;
   width: 380px;
@@ -150,7 +53,7 @@
   right: -100px;
   pointer-events: none;
 }
-.overlay-face::after {
+.overlay-container::after {
   content: "";
   position: absolute;
   width: 240px;
@@ -162,28 +65,58 @@
   pointer-events: none;
 }
 
+/* ── Panel interno del overlay (dos caras) ── */
+.overlay-panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: none;
+  transform: none !important;
+}
+
+/* ── Caras del overlay ── */
+.overlay-face {
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  position: relative;
+  z-index: 1;
+}
+
+.overlay-face.overlay-left {
+  display: flex;
+}
+
+.auth-container.active .overlay-face.overlay-left {
+  display: none;
+}
+
+.auth-container.active .overlay-face.overlay-right {
+  display: flex;
+}
+
 /* ── Contenido del overlay ── */
 .auth-brand-logo {
   display: flex;
   align-items: center;
   margin-bottom: 16px;
-  position: relative;
-  z-index: 1;
 }
 
 .auth-brand-logo img {
   height: 72px;
   width: auto;
-  filter: brightness(0) invert(1); /* lo vuelve blanco para el fondo navy */
+  filter: brightness(0) invert(1);
   object-fit: contain;
 }
+
 .overlay-tagline {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.65);
   line-height: 1.8;
-  max-width: 280px;
-  position: relative;
-  z-index: 1;
+  max-width: 260px;
 }
 
 .auth-features {
@@ -191,8 +124,6 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  position: relative;
-  z-index: 1;
 }
 .auth-feat {
   display: flex;
@@ -219,21 +150,15 @@
   background: rgba(255, 255, 255, 0.25);
   border-radius: 2px;
   margin: 28px 0 20px;
-  position: relative;
-  z-index: 1;
 }
 
 .overlay-invite {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.55);
   margin-bottom: 14px;
-  position: relative;
-  z-index: 1;
 }
 
 .btn-overlay {
-  position: relative;
-  z-index: 1;
   background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.7);
   color: #fff;
@@ -249,6 +174,71 @@
 .btn-overlay:hover {
   background: rgba(255, 255, 255, 0.15);
   border-color: #fff;
+}
+
+/* ── Lado formulario (derecha) ── */
+.auth-panel {
+  position: absolute;
+  top: 0;
+  left: 42%;
+  width: 58%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 44px;
+  background: var(--white);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.auth-form-card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.login-panel {
+  opacity: 1;
+  z-index: 2;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+.register-panel {
+  opacity: 0;
+  z-index: 1;
+  transform: translateX(20px);
+  pointer-events: none;
+}
+
+.auth-container.active .login-panel {
+  opacity: 0;
+  z-index: 1;
+  transform: translateX(-20px);
+  pointer-events: none;
+}
+
+.auth-container.active .register-panel {
+  opacity: 1;
+  z-index: 2;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+/* ── Títulos ── */
+.auth-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.auth-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
 }
 
 /* ── Selector de rol ── */
@@ -268,23 +258,13 @@
   background: var(--white);
   font-family: var(--font);
 }
-.role-btn:hover {
-  border-color: var(--brand);
-}
+.role-btn:hover { border-color: var(--brand); }
 .role-btn.selected {
   border-color: var(--brand);
   background: var(--brand-light);
 }
-.role-emoji {
-  font-size: 24px;
-  display: block;
-  margin-bottom: 6px;
-}
-.role-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
+.role-emoji { font-size: 24px; display: block; margin-bottom: 6px; }
+.role-name  { font-size: 13px; font-weight: 500; color: var(--text); }
 
 /* ── Errores ── */
 .error-msg {
@@ -307,9 +287,7 @@
   color: var(--text-muted);
   line-height: 1.7;
 }
-.auth-demo-hint strong {
-  color: var(--text);
-}
+.auth-demo-hint strong { color: var(--text); }
 
 /* ── Responsive ── */
 @media (max-width: 700px) {
@@ -323,68 +301,25 @@
     flex-direction: column;
     box-shadow: none;
   }
-  .auth-panel {
-    width: 100%;
-    position: relative;
-    padding: 24px 16px 28px;
-    transform: none !important;
-    opacity: 1 !important;
-    pointer-events: all !important;
-    background: var(--surface);
-  }
-  .auth-form-card {
-    padding: 28px 22px 24px;
-    border-radius: 14px;
-  }
-  .login-panel {
-    display: flex;
-  }
-  .register-panel {
-    display: none;
-  }
-  .auth-container.active .login-panel {
-    display: none;
-  }
-  .auth-container.active .register-panel {
-    display: flex;
-  }
   .overlay-container {
-    position: relative;
     width: 100%;
-    height: auto;
-    min-height: 160px;
-    border-radius: 0;
-    transform: none !important;
-    order: -1;
-  }
-  .overlay-panel {
-    width: 100%;
-    transform: none !important;
-    transition: none;
+    min-height: 180px;
+    padding: 28px 24px;
+    align-items: center;
   }
   .overlay-face {
-    width: 100%;
-    padding: 28px 24px;
     align-items: center;
     text-align: center;
   }
-  .overlay-left {
-    display: flex;
-  }
-  .overlay-right {
-    display: none;
-  }
-  .auth-container.active .overlay-left {
-    display: none;
-  }
-  .auth-container.active .overlay-right {
-    display: flex;
-  }
-  .auth-features {
-    display: none;
-  }
-  .overlay-face::before,
-  .overlay-face::after {
-    display: none;
+  .auth-features { display: none; }
+  .overlay-container::before,
+  .overlay-container::after { display: none; }
+
+  .auth-panel {
+    position: relative;
+    left: 0;
+    width: 100%;
+    height: auto;
+    padding: 28px 20px 36px;
   }
 }
