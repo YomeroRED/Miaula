@@ -1,363 +1,528 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MiAula — Iniciar sesión</title>
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/auth.css">
-  <link rel="stylesheet" href="css/components.css">
-  <style>
-    .form-group { margin-bottom: 0; }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MiAula — Iniciar sesión</title>
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <style>
+      .form-group {
+        margin-bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Toggle dark mode — switch con iconos -->
+    <div class="dm-toggle-wrap">
+      <span class="dm-icon">☀️</span>
+      <label class="dm-switch" title="Modo oscuro">
+        <input type="checkbox" id="dmCheckbox" />
+        <span class="dm-slider"></span>
+      </label>
+      <span class="dm-icon">🌙</span>
+    </div>
 
-<!-- Toggle dark mode — switch con iconos -->
-<div class="dm-toggle-wrap">
-  <span class="dm-icon">☀️</span>
-  <label class="dm-switch" title="Modo oscuro">
-    <input type="checkbox" id="dmCheckbox">
-    <span class="dm-slider"></span>
-  </label>
-  <span class="dm-icon">🌙</span>
-</div>
-
-<div id="auth-screen">
-  <div class="auth-container" id="authContainer">
-
-    <!-- ══════════════════════════════
+    <div id="auth-screen">
+      <div class="auth-container" id="authContainer">
+        <!-- ══════════════════════════════
          PANEL IZQUIERDO — Carrusel
     ══════════════════════════════ -->
-    <div class="overlay-container">
+        <div class="overlay-container">
+          <!-- Flecha izquierda (oculta en slide 0) -->
+          <button
+            class="carousel-arrow arrow-left hidden"
+            id="arrowLeft"
+            aria-label="Anterior"
+          >
+            &#8592;
+          </button>
+          <!-- Flecha derecha (oculta en último slide) -->
+          <button
+            class="carousel-arrow arrow-right"
+            id="arrowRight"
+            aria-label="Siguiente"
+          >
+            &#8594;
+          </button>
 
-      <!-- Flecha izquierda (oculta en slide 0) -->
-      <button class="carousel-arrow arrow-left hidden" id="arrowLeft" aria-label="Anterior">&#8592;</button>
-      <!-- Flecha derecha (oculta en último slide) -->
-      <button class="carousel-arrow arrow-right" id="arrowRight" aria-label="Siguiente">&#8594;</button>
+          <div class="carousel-track" id="carouselTrack">
+            <!-- Slide 1: Bienvenida -->
+            <div class="carousel-slide slide-brand active" data-index="0">
+              <div class="auth-brand-logo">
+                <img src="Miuala.png" alt="MiAula" />
+              </div>
+              <div class="slide-heading">Bienvenido a MiAula</div>
+              <p class="slide-tagline">Organiza y comunica en un solo lugar.</p>
+            </div>
 
-      <div class="carousel-track" id="carouselTrack">
+            <!-- Slide 2 -->
+            <div class="carousel-slide slide-feature" data-index="1">
+              <div class="feat-icon-big">✅</div>
+              <div class="slide-title">Gestión de tareas</div>
+              <p class="slide-desc">
+                Crea, asigna y da seguimiento a actividades académicas desde un
+                solo panel. Fechas límite claras y recordatorios automáticos.
+              </p>
+            </div>
 
-        <!-- Slide 1: Bienvenida -->
-        <div class="carousel-slide slide-brand active" data-index="0">
-          <div class="auth-brand-logo">
-            <img src="Miuala.png" alt="MiAula">
+            <!-- Slide 3 -->
+            <div class="carousel-slide slide-feature" data-index="2">
+              <div class="feat-icon-big">📁</div>
+              <div class="slide-title">Almacenamiento de recursos</div>
+              <p class="slide-desc">
+                Sube y organiza materiales de estudio, presentaciones y
+                archivos. Disponibles para todos en todo momento.
+              </p>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="carousel-slide slide-feature" data-index="3">
+              <div class="feat-icon-big">📊</div>
+              <div class="slide-title">Calificaciones y retroalimentación</div>
+              <p class="slide-desc">
+                Evalúa entregas con rúbricas personalizadas y envía
+                retroalimentación directa. Historial siempre disponible.
+              </p>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="carousel-slide slide-feature" data-index="4">
+              <div class="feat-icon-big">💬</div>
+              <div class="slide-title">Comunicación docente-alumno</div>
+              <p class="slide-desc">
+                Mensajería integrada, anuncios del grupo y notificaciones en
+                tiempo real para mantenerse conectados.
+              </p>
+            </div>
           </div>
-          <div class="slide-heading">Bienvenido a MiAula</div>
-          <p class="slide-tagline">Organiza y comunica en un solo lugar.</p>
+
+          <!-- Puntos inferiores centrados -->
+          <div class="carousel-dots" id="carouselDots">
+            <button
+              class="carousel-dot active"
+              data-dot="0"
+              aria-label="Slide 1"
+            ></button>
+            <button
+              class="carousel-dot"
+              data-dot="1"
+              aria-label="Slide 2"
+            ></button>
+            <button
+              class="carousel-dot"
+              data-dot="2"
+              aria-label="Slide 3"
+            ></button>
+            <button
+              class="carousel-dot"
+              data-dot="3"
+              aria-label="Slide 4"
+            ></button>
+            <button
+              class="carousel-dot"
+              data-dot="4"
+              aria-label="Slide 5"
+            ></button>
+          </div>
         </div>
+        <!-- /overlay-container -->
 
-        <!-- Slide 2 -->
-        <div class="carousel-slide slide-feature" data-index="1">
-          <div class="feat-icon-big">✅</div>
-          <div class="slide-title">Gestión de tareas</div>
-          <p class="slide-desc">Crea, asigna y da seguimiento a actividades académicas desde un solo panel. Fechas límite claras y recordatorios automáticos.</p>
-        </div>
-
-        <!-- Slide 3 -->
-        <div class="carousel-slide slide-feature" data-index="2">
-          <div class="feat-icon-big">📁</div>
-          <div class="slide-title">Almacenamiento de recursos</div>
-          <p class="slide-desc">Sube y organiza materiales de estudio, presentaciones y archivos. Disponibles para todos en todo momento.</p>
-        </div>
-
-        <!-- Slide 4 -->
-        <div class="carousel-slide slide-feature" data-index="3">
-          <div class="feat-icon-big">📊</div>
-          <div class="slide-title">Calificaciones y retroalimentación</div>
-          <p class="slide-desc">Evalúa entregas con rúbricas personalizadas y envía retroalimentación directa. Historial siempre disponible.</p>
-        </div>
-
-        <!-- Slide 5 -->
-        <div class="carousel-slide slide-feature" data-index="4">
-          <div class="feat-icon-big">💬</div>
-          <div class="slide-title">Comunicación docente-alumno</div>
-          <p class="slide-desc">Mensajería integrada, anuncios del grupo y notificaciones en tiempo real para mantenerse conectados.</p>
-        </div>
-
-      </div>
-
-      <!-- Puntos inferiores centrados -->
-      <div class="carousel-dots" id="carouselDots">
-        <button class="carousel-dot active" data-dot="0" aria-label="Slide 1"></button>
-        <button class="carousel-dot" data-dot="1" aria-label="Slide 2"></button>
-        <button class="carousel-dot" data-dot="2" aria-label="Slide 3"></button>
-        <button class="carousel-dot" data-dot="3" aria-label="Slide 4"></button>
-        <button class="carousel-dot" data-dot="4" aria-label="Slide 5"></button>
-      </div>
-
-    </div><!-- /overlay-container -->
-
-    <!-- ══════════════════════════════
+        <!-- ══════════════════════════════
          PANEL DERECHO — Login
     ══════════════════════════════ -->
-    <div class="auth-panel login-panel" id="login-form">
-      <div class="auth-form-card">
+        <div class="auth-panel login-panel" id="login-form">
+          <div class="auth-form-card">
+            <div class="auth-title">Iniciar sesión</div>
+            <div class="auth-sub">Accede a tu plataforma académica</div>
 
-        <div class="auth-title">Iniciar sesión</div>
-        <div class="auth-sub">Accede a tu plataforma académica</div>
+            <div class="error-msg" id="login-error"></div>
 
-        <div class="error-msg" id="login-error"></div>
+            <!-- Email -->
+            <div class="floating-group">
+              <input
+                type="email"
+                class="floating-input"
+                id="login-email"
+                placeholder=" "
+                autocomplete="email"
+                oninput="validateLoginEmail()"
+                onkeydown="if (event.key === 'Enter') handleLogin();"
+              />
+              <label for="login-email">Correo electrónico</label>
+            </div>
+            <div class="field-error-slot">
+              <span class="field-error" id="login-email-err"></span>
+            </div>
 
-        <!-- Email -->
-        <div class="floating-group">
-          <input type="email" class="floating-input" id="login-email"
-                 placeholder=" " autocomplete="email"
-                 oninput="validateLoginEmail()"
-                 onkeydown="if(event.key==='Enter') handleLogin()">
-          <label for="login-email">Correo electrónico</label>
-        </div>
-        <div class="field-error-slot">
-          <span class="field-error" id="login-email-err"></span>
-        </div>
+            <!-- Contraseña -->
+            <div class="floating-group">
+              <div class="input-wrap">
+                <input
+                  type="password"
+                  class="floating-input"
+                  id="login-pass"
+                  placeholder=" "
+                  autocomplete="current-password"
+                  onkeydown="if (event.key === 'Enter') handleLogin();"
+                />
+                <button
+                  class="toggle-pass"
+                  type="button"
+                  onclick="togglePass('login-pass', this)"
+                  tabindex="-1"
+                >
+                  👁
+                </button>
+              </div>
+              <label for="login-pass">Contraseña</label>
+            </div>
+            <div class="field-error-slot">
+              <span class="field-error" id="login-pass-err"></span>
+            </div>
 
-        <!-- Contraseña -->
-        <div class="floating-group">
-          <div class="input-wrap">
-            <input type="password" class="floating-input" id="login-pass"
-                   placeholder=" " autocomplete="current-password"
-                   onkeydown="if(event.key==='Enter') handleLogin()">
-            <button class="toggle-pass" type="button"
-                    onclick="togglePass('login-pass', this)" tabindex="-1">👁</button>
-          </div>
-          <label for="login-pass">Contraseña</label>
-        </div>
-        <div class="field-error-slot">
-          <span class="field-error" id="login-pass-err"></span>
-        </div>
+            <!-- Recordarme + ¿Olvidaste? en la misma fila -->
+            <div class="remember-forgot-row">
+              <div class="remember-left">
+                <input type="checkbox" class="remember-check" id="rememberMe" />
+                <label class="remember-label" for="rememberMe"
+                  >Recordarme</label
+                >
+              </div>
+              <a href="#" class="link-forgot" onclick="return false;"
+                >¿Olvidaste tu contraseña?</a
+              >
+            </div>
 
-        <!-- Recordarme + ¿Olvidaste? en la misma fila -->
-        <div class="remember-forgot-row">
-          <div class="remember-left">
-            <input type="checkbox" class="remember-check" id="rememberMe">
-            <label class="remember-label" for="rememberMe">Recordarme</label>
-          </div>
-          <a href="#" class="link-forgot" onclick="return false;">¿Olvidaste tu contraseña?</a>
-        </div>
-
-        <button class="btn-primary" id="login-btn" onclick="handleLogin()">Iniciar sesión</button>
-
-        <!-- Enlace registro debajo del botón -->
-        <div class="register-link">
-          ¿No tienes cuenta? <a href="#" onclick="showRegister(); return false;">Regístrate aquí</a>
-        </div>
-
-        <!-- SSO -->
-        <div class="sso-section">
-          <p class="sso-label">O accede con tu cuenta institucional:</p>
-          <div class="sso-row">
-            <button class="sso-btn" onclick="return false;">
-              <svg class="sso-icon" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              Google Workspace
+            <button class="btn-primary" id="login-btn" onclick="handleLogin()">
+              Iniciar sesión
             </button>
-            <button class="sso-btn" onclick="return false;">
-              <svg class="sso-icon" viewBox="0 0 24 24">
-                <path d="M11.4 2H2v9.4h9.4V2z" fill="#F25022"/>
-                <path d="M22 2h-9.4v9.4H22V2z" fill="#7FBA00"/>
-                <path d="M11.4 12.6H2V22h9.4v-9.4z" fill="#00A4EF"/>
-                <path d="M22 12.6h-9.4V22H22v-9.4z" fill="#FFB900"/>
-              </svg>
-              Microsoft 365
-            </button>
+
+            <!-- Enlace registro debajo del botón -->
+            <div class="register-link">
+              ¿No tienes cuenta?
+              <a
+                href="#"
+                onclick="
+                  showRegister();
+                  return false;
+                "
+                >Regístrate aquí</a
+              >
+            </div>
+
+            <!-- SSO -->
+            <div class="sso-section">
+              <p class="sso-label">O accede con tu cuenta institucional:</p>
+              <div class="sso-row">
+                <button class="sso-btn" onclick="return false;">
+                  <svg class="sso-icon" viewBox="0 0 24 24">
+                    <path
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      fill="#4285F4"
+                    />
+                    <path
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      fill="#34A853"
+                    />
+                    <path
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                      fill="#FBBC05"
+                    />
+                    <path
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                      fill="#EA4335"
+                    />
+                  </svg>
+                  Google Workspace
+                </button>
+                <button class="sso-btn" onclick="return false;">
+                  <svg class="sso-icon" viewBox="0 0 24 24">
+                    <path d="M11.4 2H2v9.4h9.4V2z" fill="#F25022" />
+                    <path d="M22 2h-9.4v9.4H22V2z" fill="#7FBA00" />
+                    <path d="M11.4 12.6H2V22h9.4v-9.4z" fill="#00A4EF" />
+                    <path d="M22 12.6h-9.4V22H22v-9.4z" fill="#FFB900" />
+                  </svg>
+                  Microsoft 365
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+        <!-- /login-panel -->
 
-        <div class="auth-demo-hint">
-          <strong>Cuentas demo:</strong><br>
-          docente@demo.mx / Demo1234!<br>
-          alumno@demo.mx / Demo1234!
-        </div>
-
-      </div>
-    </div><!-- /login-panel -->
-
-    <!-- ══════════════════════════════
+        <!-- ══════════════════════════════
          PANEL DERECHO — Registro
     ══════════════════════════════ -->
-    <div class="auth-panel register-panel" id="register-form">
-      <div class="auth-form-card">
+        <div class="auth-panel register-panel" id="register-form">
+          <div class="auth-form-card">
+            <div class="auth-title">Crear cuenta</div>
+            <div class="auth-sub">Únete a MiAula — es gratis</div>
 
-        <div class="auth-title">Crear cuenta</div>
-        <div class="auth-sub">Únete a MiAula — es gratis</div>
+            <div class="error-msg" id="reg-error"></div>
 
-        <div class="error-msg" id="reg-error"></div>
-
-        <!-- Nombre -->
-        <div class="floating-group">
-          <input type="text" class="floating-input" id="reg-name"
-                 placeholder=" " maxlength="80" autocomplete="name"
-                 oninput="validateName()">
-          <label for="reg-name">Nombre completo</label>
-        </div>
-        <div class="field-error-slot">
-          <span class="field-error" id="reg-name-err"></span>
-        </div>
-
-        <!-- Email -->
-        <div class="floating-group">
-          <input type="email" class="floating-input" id="reg-email"
-                 placeholder=" " autocomplete="email"
-                 oninput="validateRegEmail()">
-          <label for="reg-email">Correo electrónico</label>
-        </div>
-        <div class="field-error-slot">
-          <span class="field-error" id="reg-email-err"></span>
-        </div>
-
-        <!-- Contraseña -->
-        <div class="floating-group">
-          <div class="input-wrap">
-            <input type="password" class="floating-input" id="reg-pass"
-                   placeholder=" " autocomplete="new-password"
-                   oninput="validatePass(); validateConfirm()"
-                   onfocus="document.getElementById('pass-rules').style.display='flex'; document.getElementById('pass-strength').style.display='block'">
-            <button class="toggle-pass" type="button"
-                    onclick="togglePass('reg-pass', this)" tabindex="-1">👁</button>
-          </div>
-          <label for="reg-pass">Contraseña (mín. 8 caracteres)</label>
-        </div>
-        <div class="field-error-slot"></div>
-
-        <div class="password-strength" id="pass-strength">
-          <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
-          <div class="strength-label" id="strength-label">—</div>
-        </div>
-        <div class="pass-rules" id="pass-rules">
-          <div class="pass-rule" id="rule-len">Mínimo 8 caracteres</div>
-          <div class="pass-rule" id="rule-upper">Al menos una mayúscula</div>
-          <div class="pass-rule" id="rule-lower">Al menos una minúscula</div>
-          <div class="pass-rule" id="rule-num">Al menos un número</div>
-          <div class="pass-rule" id="rule-special">Al menos un carácter especial (!@#$%…)</div>
-        </div>
-
-        <!-- Confirmar contraseña -->
-        <div class="floating-group" style="margin-top:8px;">
-          <div class="input-wrap">
-            <input type="password" class="floating-input" id="reg-pass-confirm"
-                   placeholder=" " autocomplete="new-password"
-                   oninput="validateConfirm()">
-            <button class="toggle-pass" type="button"
-                    onclick="togglePass('reg-pass-confirm', this)" tabindex="-1">👁</button>
-          </div>
-          <label for="reg-pass-confirm">Confirmar contraseña</label>
-        </div>
-        <div class="field-error-slot">
-          <div class="pass-match" id="pass-match"></div>
-        </div>
-
-        <!-- Rol -->
-        <div style="margin-bottom:16px;">
-          <div class="role-selector">
-            <div class="role-btn selected" id="role-docente" onclick="selectRole('docente')">
-              <span class="role-emoji">👩‍🏫</span>
-              <span class="role-name">Docente</span>
+            <!-- Nombre -->
+            <div class="floating-group">
+              <input
+                type="text"
+                class="floating-input"
+                id="reg-name"
+                placeholder=" "
+                maxlength="80"
+                autocomplete="name"
+                oninput="validateName()"
+              />
+              <label for="reg-name">Nombre completo</label>
             </div>
-            <div class="role-btn" id="role-alumno" onclick="selectRole('alumno')">
-              <span class="role-emoji">🎓</span>
-              <span class="role-name">Alumno</span>
+            <div class="field-error-slot">
+              <span class="field-error" id="reg-name-err"></span>
+            </div>
+
+            <!-- Email -->
+            <div class="floating-group">
+              <input
+                type="email"
+                class="floating-input"
+                id="reg-email"
+                placeholder=" "
+                autocomplete="email"
+                oninput="validateRegEmail()"
+              />
+              <label for="reg-email">Correo electrónico</label>
+            </div>
+            <div class="field-error-slot">
+              <span class="field-error" id="reg-email-err"></span>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="floating-group">
+              <div class="input-wrap">
+                <input
+                  type="password"
+                  class="floating-input"
+                  id="reg-pass"
+                  placeholder=" "
+                  autocomplete="new-password"
+                  oninput="
+                    validatePass();
+                    validateConfirm();
+                  "
+                  onfocus="
+                    document.getElementById('pass-rules').style.display =
+                      'flex';
+                    document.getElementById('pass-strength').style.display =
+                      'block';
+                  "
+                />
+                <button
+                  class="toggle-pass"
+                  type="button"
+                  onclick="togglePass('reg-pass', this)"
+                  tabindex="-1"
+                >
+                  👁
+                </button>
+              </div>
+              <label for="reg-pass">Contraseña (mín. 8 caracteres)</label>
+            </div>
+            <div class="field-error-slot"></div>
+
+            <div class="password-strength" id="pass-strength">
+              <div class="strength-bar">
+                <div class="strength-fill" id="strength-fill"></div>
+              </div>
+              <div class="strength-label" id="strength-label">—</div>
+            </div>
+            <div class="pass-rules" id="pass-rules">
+              <div class="pass-rule" id="rule-len">Mínimo 8 caracteres</div>
+              <div class="pass-rule" id="rule-upper">
+                Al menos una mayúscula
+              </div>
+              <div class="pass-rule" id="rule-lower">
+                Al menos una minúscula
+              </div>
+              <div class="pass-rule" id="rule-num">Al menos un número</div>
+              <div class="pass-rule" id="rule-special">
+                Al menos un carácter especial (!@#$%…)
+              </div>
+            </div>
+
+            <!-- Confirmar contraseña -->
+            <div class="floating-group" style="margin-top: 8px">
+              <div class="input-wrap">
+                <input
+                  type="password"
+                  class="floating-input"
+                  id="reg-pass-confirm"
+                  placeholder=" "
+                  autocomplete="new-password"
+                  oninput="validateConfirm()"
+                />
+                <button
+                  class="toggle-pass"
+                  type="button"
+                  onclick="togglePass('reg-pass-confirm', this)"
+                  tabindex="-1"
+                >
+                  👁
+                </button>
+              </div>
+              <label for="reg-pass-confirm">Confirmar contraseña</label>
+            </div>
+            <div class="field-error-slot">
+              <div class="pass-match" id="pass-match"></div>
+            </div>
+
+            <!-- Rol -->
+            <div style="margin-bottom: 16px">
+              <div class="role-selector">
+                <div
+                  class="role-btn selected"
+                  id="role-docente"
+                  onclick="selectRole('docente')"
+                >
+                  <span class="role-emoji">👩‍🏫</span>
+                  <span class="role-name">Docente</span>
+                </div>
+                <div
+                  class="role-btn"
+                  id="role-alumno"
+                  onclick="selectRole('alumno')"
+                >
+                  <span class="role-emoji">🎓</span>
+                  <span class="role-name">Alumno</span>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-primary" id="reg-btn" onclick="handleRegister()">
+              Crear cuenta
+            </button>
+
+            <div class="register-link">
+              ¿Ya tienes cuenta?
+              <a
+                href="#"
+                onclick="
+                  showLogin();
+                  return false;
+                "
+                >Inicia sesión aquí</a
+              >
             </div>
           </div>
         </div>
-
-        <button class="btn-primary" id="reg-btn" onclick="handleRegister()">Crear cuenta</button>
-
-        <div class="register-link">
-          ¿Ya tienes cuenta? <a href="#" onclick="showLogin(); return false;">Inicia sesión aquí</a>
-        </div>
-
+        <!-- /register-panel -->
       </div>
-    </div><!-- /register-panel -->
+      <!-- /auth-container -->
+    </div>
+    <!-- /auth-screen -->
 
-  </div><!-- /auth-container -->
-</div><!-- /auth-screen -->
-
-<script src="js/utils.js"></script>
-<script src="js/db.js"></script>
-<script src="js/auth.js"></script>
-<script>
-/* ══════════════════════════════════════
+    <script src="js/utils.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+      /* ══════════════════════════════════════
    Carrusel — flechas laterales + dots abajo
 ══════════════════════════════════════ */
-(function initCarousel() {
-  const slides    = Array.from(document.querySelectorAll('.carousel-slide'));
-  const dots      = Array.from(document.querySelectorAll('.carousel-dot'));
-  const arrowL    = document.getElementById('arrowLeft');
-  const arrowR    = document.getElementById('arrowRight');
-  const TOTAL     = slides.length;
-  let current     = 0;
-  let timer       = null;
-  const DELAY     = 4500;
+      (function initCarousel() {
+        const slides = Array.from(document.querySelectorAll(".carousel-slide"));
+        const dots = Array.from(document.querySelectorAll(".carousel-dot"));
+        const arrowL = document.getElementById("arrowLeft");
+        const arrowR = document.getElementById("arrowRight");
+        const TOTAL = slides.length;
+        let current = 0;
+        let timer = null;
+        const DELAY = 4500;
 
-  function goTo(next, dir) {
-    if (next === current || next < 0 || next >= TOTAL) return;
-    const prev = current;
-    const exitClass = dir === 'next' ? 'exit-up' : 'exit-down';
+        function goTo(next, dir) {
+          if (next === current || next < 0 || next >= TOTAL) return;
+          const prev = current;
+          const exitClass = dir === "next" ? "exit-up" : "exit-down";
 
-    slides[prev].classList.remove('active');
-    slides[prev].classList.add(exitClass);
-    setTimeout(() => slides[prev].classList.remove(exitClass), 550);
+          slides[prev].classList.remove("active");
+          slides[prev].classList.add(exitClass);
+          setTimeout(() => slides[prev].classList.remove(exitClass), 550);
 
-    slides[next].style.transform = dir === 'next' ? 'translateY(30px)' : 'translateY(-30px)';
-    slides[next].style.opacity   = '0';
-    slides[next].classList.add('active');
-    slides[next].getBoundingClientRect(); // reflow
-    slides[next].style.transform = '';
-    slides[next].style.opacity   = '';
+          slides[next].style.transform =
+            dir === "next" ? "translateY(30px)" : "translateY(-30px)";
+          slides[next].style.opacity = "0";
+          slides[next].classList.add("active");
+          slides[next].getBoundingClientRect(); // reflow
+          slides[next].style.transform = "";
+          slides[next].style.opacity = "";
 
-    dots[prev].classList.remove('active');
-    dots[next].classList.add('active');
-    current = next;
-    updateArrows();
-  }
+          dots[prev].classList.remove("active");
+          dots[next].classList.add("active");
+          current = next;
+          updateArrows();
+        }
 
-  function updateArrows() {
-    arrowL.classList.toggle('hidden', current === 0);
-    arrowR.classList.toggle('hidden', current === TOTAL - 1);
-  }
+        function updateArrows() {
+          arrowL.classList.toggle("hidden", current === 0);
+          arrowR.classList.toggle("hidden", current === TOTAL - 1);
+        }
 
-  function start() {
-    stop();
-    timer = setInterval(() => goTo((current + 1) % TOTAL, 'next'), DELAY);
-  }
-  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+        function start() {
+          stop();
+          timer = setInterval(() => goTo((current + 1) % TOTAL, "next"), DELAY);
+        }
+        function stop() {
+          if (timer) {
+            clearInterval(timer);
+            timer = null;
+          }
+        }
 
-  arrowR.addEventListener('click', () => { stop(); goTo(current + 1, 'next'); start(); });
-  arrowL.addEventListener('click', () => { stop(); goTo(current - 1, 'prev'); start(); });
-  dots.forEach(d => d.addEventListener('click', () => {
-    const t = parseInt(d.dataset.dot);
-    stop(); goTo(t, t > current ? 'next' : 'prev'); start();
-  }));
+        arrowR.addEventListener("click", () => {
+          stop();
+          goTo(current + 1, "next");
+          start();
+        });
+        arrowL.addEventListener("click", () => {
+          stop();
+          goTo(current - 1, "prev");
+          start();
+        });
+        dots.forEach((d) =>
+          d.addEventListener("click", () => {
+            const t = parseInt(d.dataset.dot);
+            stop();
+            goTo(t, t > current ? "next" : "prev");
+            start();
+          }),
+        );
 
-  updateArrows();
-  start();
-})();
+        updateArrows();
+        start();
+      })();
 
-/* ══════════════════════════════════════
+      /* ══════════════════════════════════════
    Dark mode toggle — checkbox switch
 ══════════════════════════════════════ */
-(function initDarkMode() {
-  const cb   = document.getElementById('dmCheckbox');
-  const body = document.body;
-  const KEY  = 'miaula_theme';
+      (function initDarkMode() {
+        const cb = document.getElementById("dmCheckbox");
+        const body = document.body;
+        const KEY = "miaula_theme";
 
-  function apply(dark) {
-    body.classList.toggle('dark-mode', dark);
-    cb.checked = dark;
-  }
+        function apply(dark) {
+          body.classList.toggle("dark-mode", dark);
+          cb.checked = dark;
+        }
 
-  const saved = localStorage.getItem(KEY);
-  apply(saved !== null ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
+        const saved = localStorage.getItem(KEY);
+        apply(
+          saved !== null
+            ? saved === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches,
+        );
 
-  cb.addEventListener('change', () => {
-    apply(cb.checked);
-    localStorage.setItem(KEY, cb.checked ? 'dark' : 'light');
-  });
-})();
-</script>
-</body>
+        cb.addEventListener("change", () => {
+          apply(cb.checked);
+          localStorage.setItem(KEY, cb.checked ? "dark" : "light");
+        });
+      })();
+    </script>
+  </body>
 </html>

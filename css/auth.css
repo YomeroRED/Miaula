@@ -2,6 +2,23 @@
    MiAula — Auth v3
 ═══════════════════════════════════════ */
 
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUG-FIX 4 — Duplicación del ícono de ojo en Edge/IE
+   Edge (Chromium) y el antiguo IE inyectan pseudo-
+   elementos nativos ::-ms-reveal (ojo) y ::-ms-clear
+   (×) dentro de los <input type="password"> y type="text".
+   Como ya tenemos nuestro propio botón .toggle-pass,
+   ocultamos los nativos para evitar la doble visualización.
+   Esto NO afecta a Chrome, Firefox ni Safari porque
+   esos navegadores no implementan estos pseudo-elementos.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="text"]::-ms-reveal,
+input[type="text"]::-ms-clear {
+  display: none; /* Oculta el ícono nativo de Edge/IE */
+}
+
 /* ── Dark mode variables ── */
 :root {
   --dm-bg:       #0d1117;
@@ -31,14 +48,90 @@ body.dark-mode .floating-group .floating-input:focus {
   border-color: var(--brand);
   box-shadow: 0 0 0 3px rgba(26,92,255,0.18);
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUG-FIX 3 — Borde de error/ok tapado por fondo oscuro
+   En modo oscuro el background del input es #0d1117
+   (muy saturado), lo que hace que el border de 1.5px
+   quede visualmente "aplastado". Subimos la especificidad
+   y reforzamos el outline-offset para que el contorno
+   rojo/verde sea perfectamente visible. También añadimos
+   box-shadow como capa extra porque no depende del borde.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+body.dark-mode .floating-group .floating-input.input-err {
+  border-color: #ef4444;
+  border-width: 2px; /* Ligeramente más grueso para compensar el contraste oscuro */
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.22); /* Halo rojo visible sobre fondo oscuro */
+}
+body.dark-mode .floating-group .floating-input.input-ok {
+  border-color: #22c55e;
+  border-width: 2px;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.18);
+}
+body.dark-mode .floating-group .floating-input.input-err:focus {
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.35);
+}
+body.dark-mode .floating-group .floating-input.input-ok:focus {
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.28);
+}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUG-FIX 2 — Fondo parásito en el label (modo oscuro)
+   El label usa background para "cortar" visualmente el
+   borde del input al flotar (truco clásico de floating
+   label). En modo claro era var(--white); en modo oscuro
+   necesita cambiar al color de la tarjeta contenedora.
+   El problema extra: cuando el navegador autocompleta,
+   inyecta su propio background-color en el <input>,
+   dejando el label con el fondo "viejo". La solución:
+   usamos la variable --dm-card en el label para que
+   siempre coincida con el fondo real del panel.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 body.dark-mode .floating-group label {
-  background: var(--dm-input-bg);
+  /* En reposo el label está centrado sobre el input,
+     no toca el borde — el background puede ser transparente. */
+  background: transparent;
   color: var(--dm-muted);
 }
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUG-FIX 1 + 2 (dark mode) — Label estancada Y fondo parásito
+   Misma lógica de :focus-within/:has() aplicada al tema oscuro.
+   El background usa --dm-card (color del panel contenedor)
+   para que el label "corte" limpiamente el borde del input.
+   NO uses --dm-input-bg aquí: ese es el color del campo mismo,
+   no del panel — si los colores difieren, se ve un rectángulo
+   del color equivocado flotando sobre el borde.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* — Campos SIN .input-wrap — */
 body.dark-mode .floating-group .floating-input:focus ~ label,
-body.dark-mode .floating-group .floating-input:not(:placeholder-shown) ~ label {
-  background: var(--dm-card);
+body.dark-mode .floating-group .floating-input:not(:placeholder-shown) ~ label,
+
+/* — Campos CON .input-wrap — */
+body.dark-mode .floating-group:focus-within > label,
+body.dark-mode .floating-group:has(.floating-input:not(:placeholder-shown)) > label {
+  background: var(--dm-card); /* Color del panel, NO del input */
   color: var(--brand);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUG-FIX 2 (complemento) — Autocompletado del navegador
+   Cuando Chrome/Edge autocompletan un campo, aplican
+   :-webkit-autofill con su propio background amarillo/azul.
+   Usamos un box-shadow interior (inset) para "pintar"
+   sobre ese fondo sin usar !important en background,
+   que es ignorado por el navegador en estado autofilled.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+body.dark-mode .floating-input:-webkit-autofill,
+body.dark-mode .floating-input:-webkit-autofill:hover,
+body.dark-mode .floating-input:-webkit-autofill:focus {
+  /* El box-shadow inset pinta encima del fondo de autofill */
+  -webkit-box-shadow: 0 0 0 1000px var(--dm-input-bg) inset;
+  box-shadow: 0 0 0 1000px var(--dm-input-bg) inset;
+  -webkit-text-fill-color: var(--dm-text);
+  caret-color: var(--dm-text);
+  /* Transición larga para que el fondo de autofill no
+     "parpadee" de vuelta al color del navegador */
+  transition: background-color 99999s ease 0s;
 }
 body.dark-mode .auth-divider { color: var(--dm-muted); }
 body.dark-mode .auth-divider::before { background: var(--dm-border); }
@@ -379,8 +472,35 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
   padding: 0 2px;
   line-height: 1;
 }
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUG-FIX 1 — Floating label estancada en campos contraseña
+   RAÍZ DEL PROBLEMA: La estructura HTML para contraseñas es:
+     .floating-group
+       └── .input-wrap        ← wrapper del ojo
+             └── input
+       └── label              ← hermano de .input-wrap, NO del input
+   El selector clásico "input ~ label" requiere que input y
+   label sean hermanos directos; aquí NO lo son (hay un div
+   intermedio), así que el label nunca recibe el estilo flotado.
+   SOLUCIÓN: Dos selectores complementarios:
+   1. :focus-within en .floating-group  → detecta foco aunque
+      el input esté anidado dentro de .input-wrap.
+   2. :has(.floating-input:not(:placeholder-shown)) → detecta
+      que el input contiene texto (soportado en Chrome 105+,
+      Safari 15.4+, Firefox 121+).
+   Los selectores originales "input ~ label" se conservan para
+   los campos de email/texto (estructura plana sin .input-wrap).
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* — Campos SIN .input-wrap (email, texto): selector clásico hermano — */
 .floating-input:focus ~ label,
-.floating-input:not(:placeholder-shown) ~ label {
+.floating-input:not(:placeholder-shown) ~ label,
+
+/* — Campos CON .input-wrap (contraseñas): selector vía padre — */
+/* :focus-within sube el foco desde el input hasta .floating-group */
+.floating-group:focus-within > label,
+/* :has() detecta que el input ya tiene contenido escrito */
+.floating-group:has(.floating-input:not(:placeholder-shown)) > label {
   top: 9px;
   transform: none;
   font-size: 10.5px;
