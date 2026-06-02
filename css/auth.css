@@ -109,7 +109,7 @@ body.dark-mode .floating-group .floating-input:not(:placeholder-shown) ~ label,
 /* — Campos CON .input-wrap — */
 body.dark-mode .floating-group:focus-within > label,
 body.dark-mode .floating-group:has(.floating-input:not(:placeholder-shown)) > label {
-  background: var(--dm-card); /* Color del panel, NO del input */
+  background: transparent;
   color: var(--brand);
 }
 
@@ -505,7 +505,7 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
   transform: none;
   font-size: 10.5px;
   color: var(--brand);
-  background: var(--white);
+  background: transparent;
   font-weight: 500;
 }
 

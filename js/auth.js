@@ -147,7 +147,7 @@ function validateConfirm() {
     if (matchEl) { matchEl.className = 'pass-match ok'; matchEl.textContent = '✓ Las contraseñas coinciden'; }
   } else {
     setFieldState('reg-pass-confirm', 'err');
-    if (matchEl) { matchEl.className = 'pass-match err'; matchEl.textContent = '✗ Las contraseñas no coinciden'; }
+    if (matchEl) { matchEl.className = 'pass-match err'; matchEl.textContent = 'Las contraseñas no coinciden'; }
   }
 }
 
@@ -261,7 +261,7 @@ async function handleRegister() {
   } else if (pass !== confirm) {
     setFieldState('reg-pass-confirm', 'err');
     const matchEl = document.getElementById('pass-match');
-    if (matchEl) { matchEl.className = 'pass-match err'; matchEl.textContent = '✗ Las contraseñas no coinciden'; }
+    if (matchEl) { matchEl.className = 'pass-match err'; matchEl.textContent = 'Las contraseñas no coinciden'; }
     ok = false;
   }
 
