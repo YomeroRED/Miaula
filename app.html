@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MiAula</title>
 
+  <!-- Google Material Symbols — Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
@@ -30,7 +33,9 @@
         <div class="user-name" id="sidebar-uname">Usuario</div>
         <div class="user-meta" id="sidebar-urole">Rol</div>
       </div>
-      <button class="btn-logout" onclick="logout()" title="Cerrar sesión">↩</button>
+      <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+        <span class="material-symbols-outlined">logout</span>
+      </button>
     </div>
   </aside>
 
@@ -93,7 +98,7 @@
               <input class="msg-input" id="msg-input"
                      placeholder="Escribe un mensaje..."
                      onkeydown="if(event.key==='Enter') ViewMensajes.send()">
-              <button class="btn-action" onclick="ViewMensajes.send()">Enviar ↗</button>
+              <button class="btn-action" onclick="ViewMensajes.send()"><span class="material-symbols-outlined">send</span> Enviar</button>
             </div>
           </div>
         </div>
@@ -148,7 +153,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-tarea')">Cancelar</button>
-      <button class="btn-action" onclick="ModTareas.save()">💾 Guardar tarea</button>
+      <button class="btn-action" onclick="ModTareas.save()"><span class="material-symbols-outlined">save</span> Guardar tarea</button>
     </div>
   </div>
 </div>
@@ -171,11 +176,11 @@
       <div class="form-group">
         <label class="form-label">Tipo de recurso</label>
         <select class="form-select" id="r-tipo">
-          <option value="📄 PDF">📄 PDF</option>
-          <option value="📊 Presentación">📊 Presentación</option>
-          <option value="🎥 Video">🎥 Video</option>
-          <option value="🔗 Enlace">🔗 Enlace</option>
-          <option value="📝 Documento">📝 Documento</option>
+          <option value="PDF"><span class="material-symbols-outlined">picture_as_pdf</span> PDF</option>
+          <option value="Presentación"><span class="material-symbols-outlined">slideshow</span> Presentación</option>
+          <option value="Video"><span class="material-symbols-outlined">videocam</span> Video</option>
+          <option value="Enlace"><span class="material-symbols-outlined">link</span> Enlace</option>
+          <option value="Documento"><span class="material-symbols-outlined">description</span> Documento</option>
         </select>
       </div>
       <div class="form-group">
@@ -187,7 +192,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-recurso')">Cancelar</button>
-      <button class="btn-action" onclick="saveRecurso()">📁 Agregar recurso</button>
+      <button class="btn-action" onclick="saveRecurso()"><span class="material-symbols-outlined">folder_open</span> Agregar recurso</button>
     </div>
   </div>
 </div>
@@ -195,7 +200,7 @@
 <div class="modal-overlay" id="modal-entrega">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">📤 Entregar tarea</div>
+      <div class="modal-title"><span class="material-symbols-outlined">upload_file</span> Entregar tarea</div>
       <button class="modal-close" onclick="closeModal('modal-entrega')">×</button>
     </div>
     <div class="modal-body">
@@ -207,7 +212,7 @@
                   maxlength="2000"></textarea>
       </div>
       <div class="adjunto-box">
-        <span class="adjunto-icon">📎</span>
+        <span class="adjunto-icon"><span class="material-symbols-outlined">attach_file</span></span>
         <div>
           <div class="adjunto-label">Adjuntar archivo</div>
           <div class="adjunto-sub">Simulación — en versión real permite subir archivos</div>
@@ -216,7 +221,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-entrega')">Cancelar</button>
-      <button class="btn-success" onclick="ModEntrega.confirm()">✅ Confirmar entrega</button>
+      <button class="btn-success" onclick="ModEntrega.confirm()"><span class="material-symbols-outlined">task_alt</span> Confirmar entrega</button>
     </div>
   </div>
 </div>
@@ -224,7 +229,7 @@
 <div class="modal-overlay" id="modal-calificar">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">📊 Calificar entrega</div>
+      <div class="modal-title"><span class="material-symbols-outlined">grade</span> Calificar entrega</div>
       <button class="modal-close" onclick="closeModal('modal-calificar')">×</button>
     </div>
     <div class="modal-body">
@@ -248,7 +253,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-calificar')">Cancelar</button>
-      <button class="btn-action" onclick="ModCalificar.save()">💾 Guardar calificación</button>
+      <button class="btn-action" onclick="ModCalificar.save()"><span class="material-symbols-outlined">save</span> Guardar calificación</button>
     </div>
   </div>
 </div>
@@ -272,17 +277,17 @@
         <label class="form-label">Etiqueta</label>
         <select class="form-select" id="n-etiqueta">
           <option value="">— Sin etiqueta —</option>
-          <option value="clase">📚 Clase</option>
-          <option value="examen">✏️ Examen</option>
-          <option value="proyecto">🗂 Proyecto</option>
-          <option value="personal">🙋 Personal</option>
-          <option value="idea">💡 Idea</option>
+          <option value="clase"><span class="material-symbols-outlined">menu_book</span> Clase</option>
+          <option value="examen"><span class="material-symbols-outlined">edit</span> Examen</option>
+          <option value="proyecto"><span class="material-symbols-outlined">folder_special</span> Proyecto</option>
+          <option value="personal"><span class="material-symbols-outlined">person</span> Personal</option>
+          <option value="idea"><span class="material-symbols-outlined">lightbulb</span> Idea</option>
         </select>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-nota')">Cancelar</button>
-      <button class="btn-action" onclick="ModNotas.save()">💾 Guardar nota</button>
+      <button class="btn-action" onclick="ModNotas.save()"><span class="material-symbols-outlined">save</span> Guardar nota</button>
     </div>
   </div>
 </div>

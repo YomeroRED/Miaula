@@ -24,10 +24,10 @@ const ViewInicio = {
       const recursos      = DB.recursos.length;
 
       el.innerHTML = `
-        ${this._stat('blue',  '✅', 'Tareas publicadas',    tareasCount,  'este ciclo')}
-        ${this._stat('green', '📬', 'Entregas recibidas',   entregas,     `de ${DB.users.filter(u => u.role==='alumno').length} alumno(s)`)}
-        ${this._stat('amber', '📝', 'Por calificar',        entregas - calificadas, 'pendientes')}
-        ${this._stat('red',   '📁', 'Recursos disponibles', recursos,     'publicados')}
+        ${this._stat('blue',  '<span class="material-symbols-outlined">assignment_turned_in</span>', 'Tareas publicadas',    tareasCount,  'este ciclo')}
+        ${this._stat('green', '<span class="material-symbols-outlined">mark_email_read</span>', 'Entregas recibidas',   entregas,     `de ${DB.users.filter(u => u.role==='alumno').length} alumno(s)`)}
+        ${this._stat('amber', '<span class="material-symbols-outlined">pending_actions</span>', 'Por calificar',        entregas - calificadas, 'pendientes')}
+        ${this._stat('red',   '<span class="material-symbols-outlined">folder_open</span>', 'Recursos disponibles', recursos,     'publicados')}
       `;
     } else {
       const total      = DB.tareas.length;
@@ -36,10 +36,10 @@ const ViewInicio = {
       const califs     = DB.entregas.filter(e => e.alumnoId === user.id && e.calificacion != null).length;
 
       el.innerHTML = `
-        ${this._stat('blue',  '📋', 'Tareas activas',   total,      'asignadas')}
-        ${this._stat('amber', '⏳', 'Pendientes',        pending,    'sin entregar')}
-        ${this._stat('green', '✅', 'Entregadas',        entregadas, 'completadas')}
-        ${this._stat('red',   '📊', 'Calificadas',       califs,     'con nota')}
+        ${this._stat('blue',  '<span class="material-symbols-outlined">assignment</span>', 'Tareas activas',   total,      'asignadas')}
+        ${this._stat('amber', '<span class="material-symbols-outlined">hourglass_empty</span>', 'Pendientes',        pending,    'sin entregar')}
+        ${this._stat('green', '<span class="material-symbols-outlined">task_alt</span>', 'Entregadas',        entregadas, 'completadas')}
+        ${this._stat('red',   '<span class="material-symbols-outlined">grade</span>', 'Calificadas',       califs,     'con nota')}
       `;
     }
   },
@@ -63,7 +63,7 @@ const ViewInicio = {
       titleEl.textContent = 'Tareas recientes';
       const tareas = DB.tareas.slice(-3).reverse();
       if (!tareas.length) {
-        contentEl.innerHTML = emptyState('📋', 'Sin tareas aún', 'Crea tu primera tarea desde el menú "Tareas".');
+        contentEl.innerHTML = emptyState('<span class="material-symbols-outlined">assignment</span>', 'Sin tareas aún', 'Crea tu primera tarea desde el menú "Tareas".');
         return;
       }
       contentEl.innerHTML = `<div class="cards-grid">${tareas.map(t => ViewTareas.cardDocente(t)).join('')}</div>`;
@@ -74,7 +74,7 @@ const ViewInicio = {
         .slice(0, 3);
 
       if (!proximas.length) {
-        contentEl.innerHTML = emptyState('🎉', '¡Al día!', 'No tienes tareas pendientes por entregar.');
+        contentEl.innerHTML = emptyState('<span class="material-symbols-outlined">celebration</span>', '¡Al día!', 'No tienes tareas pendientes por entregar.');
         return;
       }
       contentEl.innerHTML = `<div class="cards-grid">${proximas.map(t => ViewTareas.cardAlumno(t)).join('')}</div>`;

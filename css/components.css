@@ -290,3 +290,92 @@ body.dark-mode .alert-error {
 
 /* Empty state */
 body.dark-mode .empty-title { color: var(--text); }
+
+/* ═══════════════════════════════════════
+   Material Symbols — Alineación y sizing
+═══════════════════════════════════════ */
+
+/* Reset base: hereda color del contenedor, sin espacio extra */
+.material-symbols-outlined {
+  font-size: inherit;       /* Hereda el tamaño del padre */
+  color: inherit;           /* Hereda el color del padre */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1;
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* Iconos en nav-item del sidebar: tamaño fijo y sin hueco extra */
+.nav-icon .material-symbols-outlined {
+  font-size: 20px;
+}
+
+/* Iconos en stat-cards del dashboard */
+.stat-icon .material-symbols-outlined {
+  font-size: 26px;
+}
+
+/* Iconos en botones: ligero offset para centrado óptico con el texto */
+.btn-action .material-symbols-outlined,
+.btn-success .material-symbols-outlined,
+.btn-logout .material-symbols-outlined {
+  font-size: 17px;
+  margin-right: 4px;
+  vertical-align: -3px; /* Ajuste óptico fino para alineación con texto */
+}
+
+/* Logout: sin margen derecho (solo icono, sin texto) */
+.btn-logout .material-symbols-outlined {
+  font-size: 18px;
+  margin-right: 0;
+  vertical-align: -4px;
+}
+
+/* Iconos en títulos de modales */
+.modal-title .material-symbols-outlined {
+  font-size: 20px;
+  vertical-align: -4px;
+  margin-right: 6px;
+}
+
+/* Iconos en empty states */
+.empty-icon .material-symbols-outlined {
+  font-size: 44px;
+  color: var(--text-muted);
+  font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 48;
+}
+
+/* Iconos en badges y spans inline (calificaciones, estado) */
+.badge .material-symbols-outlined,
+span > .material-symbols-outlined {
+  font-size: 13px;
+  vertical-align: -2px;
+}
+
+/* Dark mode: los iconos heredan el color correcto automáticamente
+   gracias a color:inherit — no se necesitan overrides adicionales */
+
+/* Botón de descarga de recurso — solo ícono, circular */
+.resource-dl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--green, #0F9B6E);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.resource-dl-btn:hover { opacity: .85; }
+.resource-dl-btn .material-symbols-outlined { font-size: 18px; }
+
+body.dark-mode .resource-dl-btn { background: #0F9B6E; }

@@ -41,14 +41,14 @@ const ViewPerfil = {
             </div>
             <button class="perfil-avatar-edit"
                     onclick="document.getElementById('avatar-file-input').click()"
-                    title="Cambiar foto de perfil" style="cursor:pointer">📷</button>
+                    title="Cambiar foto de perfil" style="cursor:pointer"><span class="material-symbols-outlined">photo_camera</span></button>
             <input type="file" id="avatar-file-input" accept="image/*"
                    style="display:none" onchange="ViewPerfil._onAvatarChange(event)">
           </div>
 
           <div class="perfil-name" id="perfil-display-name">${user.name}</div>
           <div class="perfil-role-badge" style="background:${roleBg};color:${roleColor}">
-            ${isDocente ? '👩‍🏫' : '🎓'} ${roleLabel}
+            ${isDocente ? '<span class="material-symbols-outlined">person</span>' : '<span class="material-symbols-outlined">school</span>'} ${roleLabel}
           </div>
           <div class="perfil-email-display">${user.email}</div>
 
@@ -98,7 +98,7 @@ const ViewPerfil = {
 
             <button class="btn-action perfil-save-btn" id="perfil-datos-btn"
                     onclick="ViewPerfil.guardarDatos()">
-              💾 Guardar cambios
+              <span class="material-symbols-outlined">save</span> Guardar cambios
             </button>
           </div>
 
@@ -114,7 +114,7 @@ const ViewPerfil = {
               <div class="input-pass-wrap">
                 <input type="password" class="form-input" id="perfil-pass-actual"
                        placeholder="••••••••">
-                <button class="pass-toggle" onclick="ViewPerfil._togglePass('perfil-pass-actual', this)">👁</button>
+                <button class="pass-toggle" onclick="ViewPerfil._togglePass('perfil-pass-actual', this)"><span class="material-symbols-outlined">visibility</span></button>
               </div>
             </div>
             <div class="grid-2">
@@ -123,7 +123,7 @@ const ViewPerfil = {
                 <div class="input-pass-wrap">
                   <input type="password" class="form-input" id="perfil-pass-nueva"
                          placeholder="Mínimo 6 caracteres">
-                  <button class="pass-toggle" onclick="ViewPerfil._togglePass('perfil-pass-nueva', this)">👁</button>
+                  <button class="pass-toggle" onclick="ViewPerfil._togglePass('perfil-pass-nueva', this)"><span class="material-symbols-outlined">visibility</span></button>
                 </div>
               </div>
               <div class="form-group">
@@ -131,14 +131,14 @@ const ViewPerfil = {
                 <div class="input-pass-wrap">
                   <input type="password" class="form-input" id="perfil-pass-confirm"
                          placeholder="Repite la contraseña">
-                  <button class="pass-toggle" onclick="ViewPerfil._togglePass('perfil-pass-confirm', this)">👁</button>
+                  <button class="pass-toggle" onclick="ViewPerfil._togglePass('perfil-pass-confirm', this)"><span class="material-symbols-outlined">visibility</span></button>
                 </div>
               </div>
             </div>
 
             <button class="btn-secondary perfil-save-btn" id="perfil-pass-btn"
                     onclick="ViewPerfil.cambiarPassword()">
-              🔒 Actualizar contraseña
+              <span class="material-symbols-outlined">lock</span> Actualizar contraseña
             </button>
           </div>
 
@@ -160,7 +160,7 @@ const ViewPerfil = {
       showError('perfil-error', 'Ingresa un correo válido.'); return;
     }
 
-    _setLoadingBtn('perfil-datos-btn', true, '💾 Guardar cambios');
+    _setLoadingBtn('perfil-datos-btn', true, '<span class="material-symbols-outlined">save</span> Guardar cambios');
     try {
       await apiCall('update_profile', { id: App.currentUser.id, name: nombre, email });
 
@@ -176,14 +176,14 @@ const ViewPerfil = {
       document.getElementById('perfil-avatar-circle').textContent  = initials(nombre);
 
       const ok = document.getElementById('perfil-success');
-      ok.textContent   = '✅ Datos actualizados correctamente.';
+      ok.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Datos actualizados correctamente.';
       ok.style.display = 'block';
       setTimeout(() => { ok.style.display = 'none'; }, 3000);
 
     } catch (err) {
       showError('perfil-error', err.message);
     } finally {
-      _setLoadingBtn('perfil-datos-btn', false, '💾 Guardar cambios');
+      _setLoadingBtn('perfil-datos-btn', false, '<span class="material-symbols-outlined">save</span> Guardar cambios');
     }
   },
 
@@ -203,7 +203,7 @@ const ViewPerfil = {
     if (nueva === actual) { showError('perfil-pass-error', 'La nueva contraseña no puede ser igual a la actual.'); return; }
     if (nueva !== confirma) { showError('perfil-pass-error', 'Las contraseñas no coinciden.'); return; }
 
-    _setLoadingBtn('perfil-pass-btn', true, '🔒 Actualizar contraseña');
+    _setLoadingBtn('perfil-pass-btn', true, '<span class="material-symbols-outlined">lock</span> Actualizar contraseña');
     try {
       await apiCall('change_password', { id: App.currentUser.id, actual, nueva });
 
@@ -212,14 +212,14 @@ const ViewPerfil = {
         .forEach(id => { document.getElementById(id).value = ''; });
 
       const ok = document.getElementById('perfil-pass-ok');
-      ok.textContent   = '✅ Contraseña actualizada correctamente.';
+      ok.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Contraseña actualizada correctamente.';
       ok.style.display = 'block';
       setTimeout(() => { ok.style.display = 'none'; }, 3000);
 
     } catch (err) {
       showError('perfil-pass-error', err.message);
     } finally {
-      _setLoadingBtn('perfil-pass-btn', false, '🔒 Actualizar contraseña');
+      _setLoadingBtn('perfil-pass-btn', false, '<span class="material-symbols-outlined">lock</span> Actualizar contraseña');
     }
   },
 
@@ -276,7 +276,7 @@ const ViewPerfil = {
     if (!input) return;
     const show      = input.type === 'password';
     input.type      = show ? 'text' : 'password';
-    btn.textContent = show ? '🙈' : '👁';
+    btn.innerHTML = show ? '<span class="material-symbols-outlined">visibility_off</span>' : '<span class="material-symbols-outlined">visibility</span>';
   },
 };
 

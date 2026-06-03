@@ -11,7 +11,7 @@ const ViewRecursos = {
     const isDocente = App.currentUser.role === 'docente';
 
     if (!DB.recursos.length) {
-      el.innerHTML = emptyState('📁', 'Sin recursos', isDocente
+      el.innerHTML = emptyState('<span class="material-symbols-outlined">folder_open</span>', 'Sin recursos', isDocente
         ? 'Agrega el primer recurso con el botón de arriba.'
         : 'El docente aún no ha subido recursos.');
       return;
@@ -22,19 +22,33 @@ const ViewRecursos = {
 
   _card(r, i, isDocente) {
     const bg = this.COLORS[i % this.COLORS.length];
+
+    // Mapeo tipo → ícono Material Symbol (los values del select ya no tienen emoji)
+    const tipoIconos = {
+      'PDF':          'picture_as_pdf',
+      'Presentación': 'slideshow',
+      'Video':        'videocam',
+      'Enlace':       'link',
+      'Documento':    'description',
+    };
+    const iconName = tipoIconos[r.tipo] || 'folder_open';
+    const tipoIcon = `<span class="material-symbols-outlined">${iconName}</span>`;
+
     const delBtn = isDocente
-      ? `<button class="btn-danger btn-sm" onclick="ViewRecursos.eliminar(${r.id})" style="background:#D93025;color:#fff;border-color:#D93025">🗑 Eliminar</button>`
+      ? `<button class="btn-danger btn-sm" onclick="ViewRecursos.eliminar(${r.id})" style="background:#D93025;color:#fff;border-color:#D93025"><span class="material-symbols-outlined">delete</span> Eliminar</button>`
       : '';
     return `
       <div class="resource-card fade-up">
-        <div class="resource-icon" style="background:${bg}">${r.tipo.split(' ')[0]}</div>
+        <div class="resource-icon" style="background:${bg}">${tipoIcon}</div>
         <div>
           <div class="resource-name">${r.nombre}</div>
-          <div class="resource-meta">${r.tipo} &nbsp;·&nbsp; ${r.materia} &nbsp;·&nbsp; ${formatDate(r.fecha)}</div>
+          <div class="resource-meta">${tipoIcon} ${r.tipo} &nbsp;·&nbsp; ${r.materia} &nbsp;·&nbsp; ${formatDate(r.fecha)}</div>
           ${r.desc ? `<div class="resource-desc">${r.desc}</div>` : ''}
         </div>
         <div class="resource-actions">
-          <button class="btn-sm" style="background:#0F9B6E;color:#fff;border:1px solid #0F9B6E;border-radius:var(--radius);padding:6px 12px;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">⬇ Descargar</button>
+          <button class="btn-sm resource-dl-btn" title="Descargar" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+            <span class="material-symbols-outlined">download</span>
+          </button>
           ${delBtn}
         </div>
       </div>`;
@@ -89,7 +103,7 @@ const ViewCalificaciones = {
     const alumnos = DB.users.filter(u => u.role === 'alumno');
 
     if (!alumnos.length) {
-      el.innerHTML = emptyState('📊', 'Sin alumnos', 'No hay alumnos registrados.');
+      el.innerHTML = emptyState('<span class="material-symbols-outlined">group</span>', 'Sin alumnos', 'No hay alumnos registrados.');
       return;
     }
 
@@ -130,7 +144,7 @@ const ViewCalificaciones = {
     const califs  = DB.entregas.filter(e => e.alumnoId === uid && e.calificacion != null);
 
     if (!califs.length) {
-      el.innerHTML = emptyState('📊', 'Sin calificaciones', 'Aún no tienes calificaciones registradas.');
+      el.innerHTML = emptyState('<span class="material-symbols-outlined">analytics</span>', 'Sin calificaciones', 'Aún no tienes calificaciones registradas.');
       return;
     }
 
@@ -142,9 +156,9 @@ const ViewCalificaciones = {
           <div class="nota-circle ${cls}">${e.calificacion}</div>
           <div class="nota-info">
             <div class="nota-materia">${tarea.titulo || '?'}</div>
-            <div class="nota-tarea">📚 ${tarea.materia || ''}</div>
-            <div class="nota-fecha">📅 Calificada: ${formatDate(e.fecha)} &nbsp;·&nbsp; Máximo: ${tarea.puntos} pts</div>
-            ${e.feedback ? `<div class="nota-comentario">💬 "${e.feedback}"</div>` : ''}
+            <div class="nota-tarea"><span class="material-symbols-outlined">menu_book</span> ${tarea.materia || ''}</div>
+            <div class="nota-fecha"><span class="material-symbols-outlined">calendar_today</span> Calificada: ${formatDate(e.fecha)} &nbsp;·&nbsp; Máximo: ${tarea.puntos} pts</div>
+            ${e.feedback ? `<div class="nota-comentario"><span class="material-symbols-outlined">chat</span> "${e.feedback}"</div>` : ''}
           </div>
         </div>`;
     }).join('')}</div>`;
@@ -245,7 +259,7 @@ const ViewMensajes = {
           const isMe = m.from === App.currentUser.id;
           return `<div><div class="bubble ${isMe ? 'me' : 'them'}">${m.text}<div class="bubble-time">${m.hora}</div></div></div>`;
         }).join('')
-      : emptyState('💬', 'Sin mensajes', 'Sé el primero en escribir.');
+      : emptyState('<span class="material-symbols-outlined">forum</span>', 'Sin mensajes', 'Sé el primero en escribir.');
 
     body.scrollTop = body.scrollHeight;
   },
@@ -299,7 +313,7 @@ const ViewAlumnos = {
     const alumnos = DB.users.filter(u => u.role === 'alumno');
 
     if (!alumnos.length) {
-      el.innerHTML = emptyState('🎓', 'Sin alumnos registrados', 'Los alumnos aparecerán aquí al crear su cuenta.');
+      el.innerHTML = emptyState('<span class="material-symbols-outlined">school</span>', 'Sin alumnos registrados', 'Los alumnos aparecerán aquí al crear su cuenta.');
       return;
     }
 
@@ -326,7 +340,7 @@ const ViewAlumnos = {
           <td>
             <button class="btn-secondary btn-sm"
               onclick="ViewMensajes.activeContact=${a.id}; App.navigateTo('mensajes')">
-              💬 Mensaje
+              <span class="material-symbols-outlined">chat</span> Mensaje
             </button>
           </td>
         </tr>`;
