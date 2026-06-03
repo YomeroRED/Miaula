@@ -14,15 +14,14 @@
     </style>
   </head>
   <body>
-    <!-- Toggle dark mode — switch con iconos -->
-    <div class="dm-toggle-wrap">
-      <span class="dm-icon">☀️</span>
-      <label class="dm-switch" title="Modo oscuro">
+    <!-- Toggle dark mode — switch con icono único (igual que app.html) -->
+    <label class="dm-toggle-wrap" title="Cambiar tema">
+      <span class="dm-toggle-icon" id="dm-icon">🌙</span>
+      <span class="dm-switch">
         <input type="checkbox" id="dmCheckbox" />
         <span class="dm-slider"></span>
-      </label>
-      <span class="dm-icon">🌙</span>
-    </div>
+      </span>
+    </label>
 
     <div id="auth-screen">
       <div class="auth-container" id="authContainer">
@@ -488,13 +487,15 @@
    Dark mode toggle — checkbox switch
 ══════════════════════════════════════ */
       (function initDarkMode() {
-        const cb = document.getElementById("dmCheckbox");
+        const cb   = document.getElementById("dmCheckbox");
+        const icon = document.getElementById("dm-icon");
         const body = document.body;
-        const KEY = "miaula_theme";
+        const KEY  = "miaula_theme";
 
         function apply(dark) {
           body.classList.toggle("dark-mode", dark);
           cb.checked = dark;
+          if (icon) icon.textContent = dark ? "☀️" : "🌙";
         }
 
         const saved = localStorage.getItem(KEY);
