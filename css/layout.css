@@ -206,3 +206,24 @@
   color: #fff;
   font-weight: 500;
 }
+
+/* ═══════════════════════════════════════
+   Dark Mode — Layout
+═══════════════════════════════════════ */
+body.dark-mode .topbar {
+  background: var(--dm-card);
+  border-bottom-color: var(--border);
+}
+body.dark-mode .page-heading { color: var(--text); }
+
+body.dark-mode .tab-bar {
+  background: var(--dm-input-bg);
+  border-color: var(--border);
+}
+body.dark-mode .tab-item        { color: var(--text-muted); }
+body.dark-mode .tab-item.active {
+  background: var(--dm-card);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+body.dark-mode .section-title { color: var(--text); }

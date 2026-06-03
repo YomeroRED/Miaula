@@ -112,7 +112,8 @@ function validatePass() {
 
   if (!pass) {
     setFieldState('reg-pass', '');
-    if (fill)  { fill.parentElement.parentElement.className = 'password-strength'; fill.style.width = '0'; }
+    if (fill)  { fill.style.width = '0'; }
+    if (parent) { parent.classList.remove('visible'); parent.className = parent.className.replace(/\bstrength-\d\b/g,'').trim(); }
     if (label) label.textContent = '—';
     return;
   }
@@ -120,7 +121,12 @@ function validatePass() {
   const { score, fails } = scorePass(pass);
 
   // Actualizar barra
-  if (parent) parent.className = `password-strength strength-${score}`;
+  if (parent) {
+    // Conserva la clase .visible, solo reemplaza la clase de nivel de fortaleza
+    const base = parent.className.replace(/\bstrength-\d\b/g,'').trim();
+    parent.className = `${base} strength-${score}`.trim();
+    parent.classList.add('visible'); // Asegura que esté visible mientras hay texto
+  }
   if (label)  label.textContent = STRENGTH_LABELS[score] || '—';
 
   // Actualizar reglas
@@ -147,7 +153,7 @@ function validateConfirm() {
     if (matchEl) { matchEl.className = 'pass-match ok'; matchEl.textContent = '✓ Las contraseñas coinciden'; }
   } else {
     setFieldState('reg-pass-confirm', 'err');
-    if (matchEl) { matchEl.className = 'pass-match err'; matchEl.textContent = 'Las contraseñas no coinciden'; }
+    if (matchEl) { matchEl.className = 'pass-match err'; matchEl.textContent = '✗ Las contraseñas no coinciden'; }
   }
 }
 
@@ -261,7 +267,7 @@ async function handleRegister() {
   } else if (pass !== confirm) {
     setFieldState('reg-pass-confirm', 'err');
     const matchEl = document.getElementById('pass-match');
-    if (matchEl) { matchEl.className = 'pass-match err'; matchEl.textContent = 'Las contraseñas no coinciden'; }
+    if (matchEl) { matchEl.className = 'pass-match err'; matchEl.textContent = '✗ Las contraseñas no coinciden'; }
     ok = false;
   }
 
@@ -319,9 +325,9 @@ function _clearRegState() {
   const matchEl = document.getElementById('pass-match');
   if (matchEl) { matchEl.className = 'pass-match'; matchEl.textContent = ''; }
   const strength = document.getElementById('pass-strength');
-  if (strength) { strength.style.display = 'none'; strength.className = 'password-strength'; }
+  if (strength) { strength.classList.remove('visible'); strength.className = strength.className.replace(/\bstrength-\d\b/g,'').trim(); }
   const rules = document.getElementById('pass-rules');
-  if (rules) rules.style.display = 'none';
+  if (rules) rules.classList.remove('visible');
   document.querySelectorAll('.pass-rule').forEach(r => r.classList.remove('ok'));
 }
 

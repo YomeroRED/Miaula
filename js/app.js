@@ -135,16 +135,18 @@ const App = {
 
   _renderTopbarActions(viewId) {
     const container = document.getElementById('topbar-actions');
-    container.innerHTML = '';
-    const isDocente = this.currentUser.role === 'docente';
+    // Conserva el toggle de dark mode (primer hijo) y elimina solo los botones de acción
+    const existingBtns = container.querySelectorAll('.topbar-action-btn');
+    existingBtns.forEach(b => b.remove());
 
-    if (viewId === 'tareas' && isDocente)  this._addTopbarBtn(container, '➕ Nueva tarea',     () => ModTareas.openModal());
+    const isDocente = this.currentUser.role === 'docente';
+    if (viewId === 'tareas' && isDocente)   this._addTopbarBtn(container, '➕ Nueva tarea',     () => ModTareas.openModal());
     if (viewId === 'recursos' && isDocente) this._addTopbarBtn(container, '📁 Agregar recurso', () => openModal('modal-recurso'));
   },
 
   _addTopbarBtn(container, label, fn) {
     const btn = document.createElement('button');
-    btn.className = 'btn-action';
+    btn.className = 'btn-action topbar-action-btn';
     btn.innerHTML = label;
     btn.addEventListener('click', fn);
     container.appendChild(btn);
@@ -186,3 +188,42 @@ const App = {
 
 /* ── Arrancar la app cuando el DOM esté listo ── */
 document.addEventListener('DOMContentLoaded', () => App.init());
+
+/* ═══════════════════════════════════════
+   Dark Mode — inicialización y persistencia
+   Usa la misma clave 'miaula_theme' que index.html
+   para que la preferencia sea compartida entre
+   la pantalla de login y la app principal.
+   localStorage persiste indefinidamente hasta
+   que el usuario limpie el caché del navegador.
+═══════════════════════════════════════ */
+(function initDarkModeApp() {
+  const KEY      = 'miaula_theme';
+  const body     = document.body;
+  const checkbox = document.getElementById('dmAppCheckbox');
+  const icon     = document.getElementById('dm-icon');
+
+  function apply(dark) {
+    body.classList.toggle('dark-mode', dark);
+    if (checkbox) checkbox.checked = dark;
+    if (icon) icon.textContent = dark ? '☀️' : '🌙';
+  }
+
+  // Leer preferencia guardada; si no existe, respetar preferencia del sistema
+  const saved = localStorage.getItem(KEY);
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  apply(saved !== null ? saved === 'dark' : prefersDark);
+
+  // Escuchar cambios del toggle
+  if (checkbox) {
+    checkbox.addEventListener('change', () => {
+      apply(checkbox.checked);
+      localStorage.setItem(KEY, checkbox.checked ? 'dark' : 'light');
+    });
+  }
+
+  // Sincronizar si el usuario cambia el tema desde otra pestaña
+  window.addEventListener('storage', (e) => {
+    if (e.key === KEY) apply(e.newValue === 'dark');
+  });
+})();

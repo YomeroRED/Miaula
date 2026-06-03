@@ -75,46 +75,7 @@ body.dark-mode .floating-group .floating-input.input-ok:focus {
   box-shadow: 0 0 0 3px rgba(34,197,94,0.28);
 }
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   BUG-FIX 2 — Fondo parásito en el label (modo oscuro)
-   El label usa background para "cortar" visualmente el
-   borde del input al flotar (truco clásico de floating
-   label). En modo claro era var(--white); en modo oscuro
-   necesita cambiar al color de la tarjeta contenedora.
-   El problema extra: cuando el navegador autocompleta,
-   inyecta su propio background-color en el <input>,
-   dejando el label con el fondo "viejo". La solución:
-   usamos la variable --dm-card en el label para que
-   siempre coincida con el fondo real del panel.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-body.dark-mode .floating-group label {
-  /* En reposo el label está centrado sobre el input,
-     no toca el borde — el background puede ser transparente. */
-  background: transparent;
-  color: var(--dm-muted);
-}
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   BUG-FIX 1 + 2 (dark mode) — Label estancada Y fondo parásito
-   Misma lógica de :focus-within/:has() aplicada al tema oscuro.
-   El background usa --dm-card (color del panel contenedor)
-   para que el label "corte" limpiamente el borde del input.
-   NO uses --dm-input-bg aquí: ese es el color del campo mismo,
-   no del panel — si los colores difieren, se ve un rectángulo
-   del color equivocado flotando sobre el borde.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-/* — Campos SIN .input-wrap — */
-body.dark-mode .floating-group .floating-input:focus ~ label,
-body.dark-mode .floating-group .floating-input:not(:placeholder-shown) ~ label,
-
-/* — Campos CON .input-wrap — */
-body.dark-mode .floating-group:focus-within > label,
-body.dark-mode .floating-group:has(.floating-input:not(:placeholder-shown)) > label {
-  background: transparent;
-  color: var(--brand);
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   BUG-FIX 2 (complemento) — Autocompletado del navegador
+   BUG-FIX 2 — Autocompletado del navegador
    Cuando Chrome/Edge autocompletan un campo, aplican
    :-webkit-autofill con su propio background amarillo/azul.
    Usamos un box-shadow interior (inset) para "pintar"
@@ -124,13 +85,10 @@ body.dark-mode .floating-group:has(.floating-input:not(:placeholder-shown)) > la
 body.dark-mode .floating-input:-webkit-autofill,
 body.dark-mode .floating-input:-webkit-autofill:hover,
 body.dark-mode .floating-input:-webkit-autofill:focus {
-  /* El box-shadow inset pinta encima del fondo de autofill */
   -webkit-box-shadow: 0 0 0 1000px var(--dm-input-bg) inset;
   box-shadow: 0 0 0 1000px var(--dm-input-bg) inset;
   -webkit-text-fill-color: var(--dm-text);
   caret-color: var(--dm-text);
-  /* Transición larga para que el fondo de autofill no
-     "parpadee" de vuelta al color del navegador */
   transition: background-color 99999s ease 0s;
 }
 body.dark-mode .auth-divider { color: var(--dm-muted); }
@@ -336,30 +294,20 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
   max-width: 230px;
 }
 
-/* Flechas laterales */
+/*
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  MODIFICACIÓN 1 — Flechas del carrusel eliminadas
+  Los botones siguen existiendo en el HTML pero se
+  ocultan completamente. El carrusel opera solo por
+  autoplay y dots. display:none los saca del flujo
+  y de tab-order; pointer-events:none es redundante
+  pero se conserva como capa de seguridad.
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
 .carousel-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.12);
-  border: none;
-  cursor: pointer;
-  color: rgba(255,255,255,0.7);
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, color 0.2s, opacity 0.25s;
-  backdrop-filter: blur(4px);
-  line-height: 1;
+  display: none;         /* Oculta por completo — sin espacio, sin interacción */
+  pointer-events: none;  /* Doble seguridad: ningún evento puede dispararse */
 }
-.carousel-arrow:hover { background: rgba(255,255,255,0.22); color: #fff; }
-.carousel-arrow.arrow-left  { left: 14px; }
-.carousel-arrow.arrow-right { right: 24px; }
-.carousel-arrow.hidden { opacity: 0; pointer-events: none; }
 
 /* Puntos inferiores centrados */
 .carousel-dots {
@@ -389,6 +337,22 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
 /* ══════════════════════════════════════
    PANEL DERECHO — Formulario
 ══════════════════════════════════════ */
+/*
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BUG-FIX — .auth-panel: crecimiento dinámico del registro
+  PROBLEMA: position:absolute + height:100% + justify-content:center
+  hacen que el panel tenga un tamaño fijo. Cuando .pass-rules
+  aparece y el contenido crece, no hay espacio extra disponible:
+  los elementos de abajo quedan fuera del área visible o solapados.
+  SOLUCIÓN:
+  - justify-content: flex-start → el contenido arranca desde arriba
+    y crece hacia abajo libremente dentro del scroll del panel.
+  - El padding vertical (32px top/bottom) reemplaza el centrado
+    artificial, dando margen visual suficiente en ambos paneles.
+  - overflow-y: auto ya estaba — se mantiene para scroll si se
+    necesita en pantallas pequeñas.
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
 .auth-panel {
   position: absolute;
   top: 0;
@@ -397,7 +361,7 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* Era center — causaba solapamiento al crecer el contenido */
   align-items: center;
   padding: 32px 48px;
   background: var(--white);
@@ -405,17 +369,47 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
   transition: opacity 0.35s ease, transform 0.35s ease, background 0.3s;
 }
 
+/*
+  El form-card necesita centrarse visualmente cuando el contenido
+  es corto (login) pero no colapsar cuando es largo (registro).
+  min-height: 100% + margin: auto logra centrado flexible:
+  si el contenido es menor al panel → se centra;
+  si crece → simplemente ocupa el espacio sin romper nada.
+*/
 .auth-form-card {
   width: 100%;
   max-width: 360px;
   display: flex;
   flex-direction: column;
+  margin: auto 0; /* Centra verticalmente solo si hay espacio sobrante */
 }
 
-.login-panel   { opacity:1; z-index:2; transform:translateX(0);    pointer-events:all;  }
-.register-panel{ opacity:0; z-index:1; transform:translateX(20px); pointer-events:none; }
-.auth-container.active .login-panel    { opacity:0; z-index:1; transform:translateX(-20px); pointer-events:none; }
-.auth-container.active .register-panel{ opacity:1; z-index:2; transform:translateX(0);     pointer-events:all;  }
+
+
+/*
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  MODIFICACIÓN 2 — Transición VERTICAL Login ↔ Registro
+  ANTES: translateX (horizontal) — no encajaba con el
+  layout de panel derecho estático.
+  AHORA: translateY (vertical):
+    • Login sale hacia ARRIBA  (-24px) al ir a registro
+    • Registro entra desde ABAJO (+24px)
+    • Al volver: registro sale hacia abajo, login entra desde arriba
+  El .auth-panel padre tiene overflow-y:auto (ya existente)
+  y el .auth-container tiene overflow:hidden — ambos evitan
+  que los paneles en tránsito sean visibles fuera del marco.
+  Los paneles usan position:absolute sobre el mismo espacio,
+  por lo que nunca generan scrollbars durante la animación.
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+/* Estado base — Login visible, Registro esperando abajo */
+.login-panel    { opacity: 1; z-index: 2; transform: translateY(0);    pointer-events: all;  }
+.register-panel { opacity: 0; z-index: 1; transform: translateY(24px); pointer-events: none; }
+
+/* Estado activo (.active en #authContainer) — Registro visible, Login sale hacia arriba */
+.auth-container.active .login-panel    { opacity: 0; z-index: 1; transform: translateY(-24px); pointer-events: none; }
+.auth-container.active .register-panel { opacity: 1; z-index: 2; transform: translateY(0);     pointer-events: all;  }
 
 /* Títulos */
 .auth-title {
@@ -505,8 +499,37 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
   transform: none;
   font-size: 10.5px;
   color: var(--brand);
-  background: transparent;
+  /* En modo claro: fondo blanco para cortar el borde visualmente */
+  background: var(--white);
   font-weight: 500;
+}
+
+/*
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  CORRECCIÓN — Rectángulo blanco en dark mode
+  Los selectores de arriba no tienen prefijo body.dark-mode,
+  por lo que en dark mode aplican background:var(--white)
+  con la misma especificidad que los overrides de dark mode,
+  generando una "carrera" que a veces gana el blanco.
+  Solución: subir especificidad del override dark-mode con
+  el mismo grupo de selectores, garantizando que SIEMPRE
+  gane el color correcto del panel oscuro cuando corresponde.
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+/* Dark mode — label en REPOSO: sin fondo (está sobre el relleno del input, no sobre el borde) */
+body.dark-mode .floating-group label {
+  background: transparent;
+  color: var(--dm-muted);
+}
+
+/* Dark mode — label FLOTADO: usa el color del panel para cortar el borde limpiamente */
+body.dark-mode .floating-input:focus ~ label,
+body.dark-mode .floating-input:not(:placeholder-shown) ~ label,
+body.dark-mode .floating-group:focus-within > label,
+body.dark-mode .floating-group:has(.floating-input:not(:placeholder-shown)) > label {
+  background: var(--dm-card);
+  color: var(--brand);
 }
 
 /* Wrapper ojo */
@@ -665,7 +688,24 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
 .role-name  { font-size: 12.5px; font-weight: 500; color: var(--text); }
 
 /* Strength */
-.password-strength { margin-top: 4px; display: none; }
+/*
+  .password-strength usa el mismo patrón max-height para que
+  la barra de fortaleza y .pass-rules empujen juntas de forma
+  coordinada y no haya saltos visuales entre ambas apariciones.
+*/
+.password-strength {
+  display: block;          /* Siempre en flujo */
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.25s ease;
+}
+.password-strength.visible {
+  max-height: 36px;
+  opacity: 1;
+  margin-top: 4px;
+}
 .strength-bar { height: 4px; border-radius: 2px; background: var(--border-md); overflow: hidden; margin-bottom: 4px; }
 .strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
 .strength-label { font-size: 11px; font-weight: 500; }
@@ -676,7 +716,41 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
 .strength-1 .strength-label{color:#ef4444;}.strength-2 .strength-label{color:#f97316;}
 .strength-3 .strength-label{color:#eab308;}.strength-4 .strength-label{color:#22c55e;}
 
-.pass-rules { margin-top: 6px; display: none; flex-direction: column; gap: 3px; }
+/*
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BUG-FIX — .pass-rules: empuje fluido en lugar de display:none
+  PROBLEMA ORIGINAL: display:none → display:flex via JS inline.
+  El toggle de display es instantáneo y no transicionable — el
+  campo "Confirmar contraseña" aparece/desaparece de golpe y
+  en algunos casos se solapa porque el reflow no se completa
+  antes de que el navegador pinte el frame siguiente.
+  SOLUCIÓN: max-height + overflow:hidden para una transición
+  CSS pura y suave:
+  - Estado oculto:  max-height: 0  → sin altura, sin espacio
+  - Estado visible: max-height: 130px → suficiente para 5 reglas
+  - overflow:hidden evita que el contenido sea visible mientras
+    la altura está colapsando/expandiéndose
+  - opacity complementa la transición visualmente
+  IMPORTANTE: El JS debe cambiar la clase .visible en lugar de
+  manipular style.display directamente (ver también index.html).
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+.pass-rules {
+  display: flex;           /* Siempre flex — nunca display:none */
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;        /* Clave: oculta el contenido mientras colapsa */
+  max-height: 0;           /* Colapsado por defecto */
+  opacity: 0;
+  margin-top: 0;
+  /* Entrada suave: max-height tarda un poco más para que se vea el "empuje" */
+  transition: max-height 0.28s ease, opacity 0.2s ease, margin-top 0.28s ease;
+}
+.pass-rules.visible {
+  max-height: 130px;       /* Altura suficiente para las 5 reglas con gap */
+  opacity: 1;
+  margin-top: 6px;
+}
 .pass-rule { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; transition: color 0.2s; }
 .pass-rule::before { content: '○'; font-size: 9px; }
 .pass-rule.ok { color: #22c55e; }
@@ -692,5 +766,4 @@ body.dark-mode .sso-label { color: var(--dm-muted); }
   .overlay-container { width: 100%; min-height: 220px; padding-bottom: 20px; }
   .carousel-slide { padding: 28px 24px 16px; }
   .auth-panel { position: relative; left: 0; width: 100%; height: auto; padding: 24px 20px 36px; overflow-y: visible; }
-  .carousel-arrow.arrow-right { right: 14px; }
 }

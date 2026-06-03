@@ -223,3 +223,70 @@
 .empty-icon       { font-size: 48px; margin-bottom: 12px; }
 .empty-title      { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
 .empty-sub        { font-size: 13px; }
+
+/* ═══════════════════════════════════════
+   Dark Mode — Componentes
+═══════════════════════════════════════ */
+body.dark-mode .btn-secondary {
+  background: var(--dm-card);
+  color: var(--text);
+  border-color: var(--border-md);
+}
+body.dark-mode .btn-secondary:hover { border-color: var(--brand); color: var(--brand); }
+
+/* Formularios */
+body.dark-mode .form-input,
+body.dark-mode .form-select,
+body.dark-mode .form-textarea {
+  background: var(--dm-input-bg);
+  border-color: var(--border-md);
+  color: var(--text);
+}
+body.dark-mode .form-input:focus,
+body.dark-mode .form-select:focus,
+body.dark-mode .form-textarea:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(26,92,255,0.18);
+}
+body.dark-mode .form-label { color: var(--text-muted); }
+
+/* Tabla */
+body.dark-mode .data-table {
+  background: var(--dm-card);
+  border-color: var(--border);
+}
+body.dark-mode .data-table th {
+  background: var(--dm-input-bg);
+  color: var(--text-muted);
+  border-bottom-color: var(--border);
+}
+body.dark-mode .data-table td {
+  color: var(--text);
+  border-bottom-color: var(--border);
+}
+body.dark-mode .data-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+/* Modal */
+body.dark-mode .modal-overlay { background: rgba(0,0,0,0.65); }
+body.dark-mode .modal {
+  background: var(--dm-card);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+body.dark-mode .modal-header { border-bottom-color: var(--border); }
+body.dark-mode .modal-title  { color: var(--text); }
+body.dark-mode .modal-close  { color: var(--text-muted); }
+body.dark-mode .modal-close:hover { background: rgba(255,255,255,0.06); }
+body.dark-mode .modal-footer { border-top-color: var(--border); }
+
+/* Alertas */
+body.dark-mode .alert-success {
+  background: rgba(15,155,110,0.15);
+  color: #4ade80;
+}
+body.dark-mode .alert-error {
+  background: rgba(217,48,37,0.15);
+  color: #f87171;
+}
+
+/* Empty state */
+body.dark-mode .empty-title { color: var(--text); }

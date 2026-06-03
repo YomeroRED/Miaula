@@ -309,10 +309,12 @@
                     validateConfirm();
                   "
                   onfocus="
-                    document.getElementById('pass-rules').style.display =
-                      'flex';
-                    document.getElementById('pass-strength').style.display =
-                      'block';
+                    document
+                      .getElementById('pass-rules')
+                      .classList.add('visible');
+                    document
+                      .getElementById('pass-strength')
+                      .classList.add('visible');
                   "
                 />
                 <button
@@ -424,13 +426,11 @@
     <script src="js/auth.js"></script>
     <script>
       /* ══════════════════════════════════════
-   Carrusel — flechas laterales + dots abajo
+   Carrusel — autoplay + dots (flechas removidas)
 ══════════════════════════════════════ */
       (function initCarousel() {
         const slides = Array.from(document.querySelectorAll(".carousel-slide"));
         const dots = Array.from(document.querySelectorAll(".carousel-dot"));
-        const arrowL = document.getElementById("arrowLeft");
-        const arrowR = document.getElementById("arrowRight");
         const TOTAL = slides.length;
         let current = 0;
         let timer = null;
@@ -449,23 +449,18 @@
             dir === "next" ? "translateY(30px)" : "translateY(-30px)";
           slides[next].style.opacity = "0";
           slides[next].classList.add("active");
-          slides[next].getBoundingClientRect(); // reflow
+          slides[next].getBoundingClientRect(); // fuerza reflow para activar la transición
           slides[next].style.transform = "";
           slides[next].style.opacity = "";
 
           dots[prev].classList.remove("active");
           dots[next].classList.add("active");
           current = next;
-          updateArrows();
-        }
-
-        function updateArrows() {
-          arrowL.classList.toggle("hidden", current === 0);
-          arrowR.classList.toggle("hidden", current === TOTAL - 1);
         }
 
         function start() {
           stop();
+          // Ciclo continuo: al llegar al último slide vuelve al primero
           timer = setInterval(() => goTo((current + 1) % TOTAL, "next"), DELAY);
         }
         function stop() {
@@ -475,27 +470,18 @@
           }
         }
 
-        arrowR.addEventListener("click", () => {
-          stop();
-          goTo(current + 1, "next");
-          start();
-        });
-        arrowL.addEventListener("click", () => {
-          stop();
-          goTo(current - 1, "prev");
-          start();
-        });
+        // Dots: permiten saltar a cualquier slide y reinician el timer
         dots.forEach((d) =>
           d.addEventListener("click", () => {
             const t = parseInt(d.dataset.dot);
+            if (t === current) return; // clic en el dot activo no hace nada
             stop();
             goTo(t, t > current ? "next" : "prev");
             start();
           }),
         );
 
-        updateArrows();
-        start();
+        start(); // arranca el autoplay al cargar
       })();
 
       /* ══════════════════════════════════════
