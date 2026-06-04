@@ -23,7 +23,6 @@ const ViewRecursos = {
   _card(r, i, isDocente) {
     const bg = this.COLORS[i % this.COLORS.length];
 
-    // Mapeo tipo → ícono Material Symbol (los values del select ya no tienen emoji)
     const tipoIconos = {
       'PDF':          'picture_as_pdf',
       'Presentación': 'slideshow',
@@ -35,18 +34,20 @@ const ViewRecursos = {
     const tipoIcon = `<span class="material-symbols-outlined">${iconName}</span>`;
 
     const delBtn = isDocente
-      ? `<button class="btn-danger btn-sm" onclick="ViewRecursos.eliminar(${r.id})" style="background:#D93025;color:#fff;border-color:#D93025"><span class="material-symbols-outlined">delete</span> Eliminar</button>`
+      ? `<button class="btn-danger btn-sm" onclick="ViewRecursos.eliminar(${r.id})"><span class="material-symbols-outlined">delete</span> Eliminar</button>`
       : '';
     return `
       <div class="resource-card fade-up">
-        <div class="resource-icon" style="background:${bg}">${tipoIcon}</div>
-        <div>
-          <div class="resource-name">${r.nombre}</div>
-          <div class="resource-meta">${tipoIcon} ${r.tipo} &nbsp;·&nbsp; ${r.materia} &nbsp;·&nbsp; ${formatDate(r.fecha)}</div>
-          ${r.desc ? `<div class="resource-desc">${r.desc}</div>` : ''}
+        <div class="resource-card-header">
+          <div class="resource-icon" style="background:${bg}">${tipoIcon}</div>
+          <div class="resource-card-body">
+            <div class="resource-name">${r.nombre}</div>
+            <div class="resource-meta">${tipoIcon} ${r.tipo} &nbsp;·&nbsp; ${r.materia} &nbsp;·&nbsp; ${formatDate(r.fecha)}</div>
+          </div>
         </div>
+        ${r.desc ? `<div class="resource-desc">${r.desc}</div>` : ''}
         <div class="resource-actions">
-          <button class="btn-sm resource-dl-btn" title="Descargar" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          <button class="resource-dl-btn" title="Descargar">
             <span class="material-symbols-outlined">download</span>
           </button>
           ${delBtn}

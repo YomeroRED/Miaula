@@ -115,17 +115,26 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 9px;
+  padding: 4px 10px;
   border-radius: 99px;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
+  letter-spacing: 0.2px;
 }
-.badge-pending   { background: var(--amber-light); color: #92700A; }
-.badge-submitted { background: var(--brand-light);  color: #1244AA; }
-.badge-graded    { background: var(--green-light);   color: #0B6B4A; }
-.badge-late      { background: var(--red-light);     color: var(--red); }
-.badge-active    { background: var(--green-light);   color: #0B6B4A; }
+/* Badges más oscuros y notorios — fondo sólido con color texto claro */
+.badge-pending   { background: #B45309; color: #FFF8E0; }   /* Ámbar oscuro */
+.badge-submitted { background: #1A5CFF; color: #EEF3FF; }   /* Azul marca */
+.badge-graded    { background: #0B6B4A; color: #E0FFF4; }   /* Verde oscuro */
+.badge-late      { background: #B91C1C; color: #FFE4E4; }   /* Rojo oscuro */
+.badge-active    { background: #0B6B4A; color: #E0FFF4; }   /* Verde oscuro */
+
+/* Dark mode: los badges ya tienen fondos sólidos oscuros — solo ajustamos brillo */
+body.dark-mode .badge-pending   { background: #D97706; color: #1C1200; }
+body.dark-mode .badge-submitted { background: #3B7BFF; color: #001233; }
+body.dark-mode .badge-graded    { background: #10B981; color: #002916; }
+body.dark-mode .badge-late      { background: #EF4444; color: #2D0000; }
+body.dark-mode .badge-active    { background: #10B981; color: #002916; }
 
 /* ── Tabla ── */
 .data-table {
