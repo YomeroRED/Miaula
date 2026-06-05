@@ -1,0 +1,298 @@
+/* ═══════════════════════════════════════
+   MiAula — perfil-gamification.css
+   Estilos exclusivos para secciones de
+   Progreso Académico, Racha e Impacto
+═══════════════════════════════════════ */
+
+/* ── Nivel: círculo + info ─────────────────────────────────── */
+.gam-level-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.gam-level-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.57rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(15,155,110,0.35);
+}
+
+.gam-level-circle--doc {
+  background: var(--brand);
+  box-shadow: 0 2px 10px rgba(26,92,255,0.35);
+}
+
+.gam-level-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gam-titulo {
+  font-size: 1.07rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+/* ── XP row ────────────────────────────────────────────────── */
+.gam-xp-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: 0.86rem;
+}
+
+.gam-xp-cur {
+  font-weight: 700;
+  color: var(--green);
+}
+
+.gam-xp-sep {
+  color: var(--text-muted);
+}
+
+.gam-xp-max {
+  color: var(--text-muted);
+}
+
+/* ── Barra de progreso ─────────────────────────────────────── */
+.gam-bar-wrap {
+  height: 8px;
+  background: var(--surface);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 4px;
+  border: 1px solid var(--border);
+}
+
+.gam-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green) 0%, #34d399 100%);
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+.gam-bar-wrap--doc .gam-bar-fill {
+  background: linear-gradient(90deg, var(--brand) 0%, #6ea0ff 100%);
+}
+
+.gam-pct {
+  font-size: 0.79rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* ── Mini stats ────────────────────────────────────────────── */
+.gam-stats-mini {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.gam-stat-mini {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  border-right: 1px solid var(--border);
+}
+
+.gam-stat-mini:last-child { border-right: none; }
+
+.gam-stat-val {
+  font-size: 1.29rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.gam-stat-lbl {
+  font-size: 0.71rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* ── Racha ─────────────────────────────────────────────────── */
+.gam-racha-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.gam-racha-item {
+  flex: 1;
+  text-align: center;
+  padding: 14px 8px;
+}
+
+.gam-racha-sep {
+  width: 1px;
+  background: var(--border);
+  align-self: stretch;
+}
+
+.gam-racha-num {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--orange, #f97316);
+  line-height: 1.1;
+}
+
+.gam-racha-lbl {
+  font-size: 0.79rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── Insignias / Logros ────────────────────────────────────── */
+.gam-badges-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gam-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: transform 0.15s;
+}
+
+.gam-badge--on {
+  background: var(--green-light, #e2f7f0);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.gam-badge--off {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.gam-badge--on:hover { transform: scale(1.04); }
+
+.gam-badge-icon { font-size: 1.14rem; }
+
+.gam-badge-lbl  { font-size: 0.79rem; }
+
+/* ── Dark mode ─────────────────────────────────────────────── */
+.dark-mode .gam-bar-wrap      { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.10); }
+.dark-mode .gam-stats-mini    { border-color: rgba(255,255,255,0.10); }
+.dark-mode .gam-stat-mini     { border-color: rgba(255,255,255,0.10); }
+.dark-mode .gam-racha-row     { border-color: rgba(255,255,255,0.10); }
+.dark-mode .gam-racha-sep     { background: rgba(255,255,255,0.10); }
+.dark-mode .gam-badge--off    { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.10); }
+.dark-mode .gam-badge--on     { background: rgba(15,155,110,0.15);  border-color: var(--green); }
+.dark-mode .gam-stat-val      { color: #e5e7eb; }
+.dark-mode .gam-titulo        { color: #e5e7eb; }
+
+/* ── Font size control ──────────────────────────────────────── */
+.font-size-options {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.font-size-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius);
+  background: var(--white);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 1.29rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.font-size-btn small {
+  font-size: 0.71rem;
+  font-weight: 500;
+  display: block;
+}
+
+.font-size-btn.active,
+.font-size-btn:hover {
+  border-color: var(--brand);
+  background: var(--brand-light);
+  color: var(--brand);
+}
+
+.font-size-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.font-size-range {
+  flex: 1;
+  accent-color: var(--brand);
+  height: 4px;
+  cursor: pointer;
+}
+
+.font-size-range-lbl {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.font-size-range-lbl--lg {
+  font-size: 1.29rem;
+}
+
+.font-size-range-val {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--brand);
+  min-width: 34px;
+  text-align: right;
+}
+
+.dark-mode .font-size-btn {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+  color: var(--text-muted);
+}
+
+.dark-mode .font-size-btn.active,
+.dark-mode .font-size-btn:hover {
+  background: rgba(26,92,255,0.18);
+  border-color: var(--brand);
+  color: #93c5fd;
+}

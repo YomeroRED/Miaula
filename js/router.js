@@ -12,6 +12,7 @@ const Views = {
     switch (viewId) {
       case 'inicio':         ViewInicio.render();         break;
       case 'tareas':         ViewTareas.render();         break;
+      case 'clases':         ViewClases.render();         break;
       case 'recursos':       ViewRecursos.render();       break;
       case 'calificaciones': ViewCalificaciones.render(); break;
       case 'mensajes':       ViewMensajes.render();       break;

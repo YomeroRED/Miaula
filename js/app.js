@@ -16,7 +16,7 @@ const App = {
     // Spinner superpuesto — no destruye las vistas del DOM
     const _spin = document.createElement('div');
     _spin.style.cssText = 'position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(255,255,255,.75);font-size:18px;color:#666;z-index:999';
-    _spin.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Cargando...';
+    _spin.textContent = '⏳ Cargando datos...';
     document.body.appendChild(_spin);
 
     try {
@@ -57,21 +57,23 @@ const App = {
 
     const navItems = isDocente
       ? [
-          { id: 'inicio',         label: 'Inicio',         icon: 'home' },
-          { id: 'tareas',         label: 'Tareas',         icon: 'assignment' },
-          { id: 'recursos',       label: 'Recursos',       icon: 'folder_open' },
-          { id: 'calificaciones', label: 'Calificaciones', icon: 'analytics' },
-          { id: 'alumnos',        label: 'Alumnos',        icon: 'school' },
-          { id: 'notas',          label: 'Mis notas',      icon: 'edit_note' },
-          { id: 'mensajes',       label: 'Mensajes',       icon: 'forum', badge: this._unreadCount() },
+          { id: 'inicio',         label: 'Inicio',         icon: '🏠' },
+          { id: 'clases',         label: 'Clases',         icon: '🏫' },
+          { id: 'tareas',         label: 'Tareas',         icon: '✅' },
+          { id: 'recursos',       label: 'Recursos',       icon: '📁' },
+          { id: 'calificaciones', label: 'Calificaciones', icon: '📊' },
+          { id: 'alumnos',        label: 'Alumnos',        icon: '🎓' },
+          { id: 'notas',          label: 'Mis notas',      icon: '📝' },
+          { id: 'mensajes',       label: 'Mensajes',       icon: '💬', badge: this._unreadCount() },
         ]
       : [
-          { id: 'inicio',         label: 'Inicio',         icon: 'home' },
-          { id: 'tareas',         label: 'Tareas',         icon: 'assignment', badge: pendingCount(this.currentUser.id) },
-          { id: 'recursos',       label: 'Recursos',       icon: 'folder_open' },
-          { id: 'calificaciones', label: 'Calificaciones', icon: 'analytics' },
-          { id: 'notas',          label: 'Mis notas',      icon: 'edit_note' },
-          { id: 'mensajes',       label: 'Mensajes',       icon: 'forum' },
+          { id: 'inicio',         label: 'Inicio',         icon: '🏠' },
+          { id: 'clases',         label: 'Mis Clases',     icon: '🏫' },
+          { id: 'tareas',         label: 'Tareas',         icon: '✅', badge: pendingCount(this.currentUser.id) },
+          { id: 'recursos',       label: 'Recursos',       icon: '📁' },
+          { id: 'calificaciones', label: 'Calificaciones', icon: '📊' },
+          { id: 'notas',          label: 'Mis notas',      icon: '📝' },
+          { id: 'mensajes',       label: 'Mensajes',       icon: '💬' },
         ];
 
     const nav = document.getElementById('sidebar-nav');
@@ -82,7 +84,7 @@ const App = {
       el.className    = 'nav-item' + (item.id === this.currentView ? ' active' : '');
       el.dataset.view = item.id;
       el.innerHTML = `
-        <span class="nav-icon"><span class="material-symbols-outlined">${item.icon}</span></span>
+        <span class="nav-icon">${item.icon}</span>
         ${item.label}
         ${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}
       `;
@@ -92,7 +94,7 @@ const App = {
 
     const gear = document.getElementById('sidebar-gear');
     gear.className = 'nav-item nav-gear' + (this.currentView === 'perfil' ? ' active' : '');
-    gear.innerHTML = '<span class="nav-icon"><span class="material-symbols-outlined">settings</span></span> Configuración';
+    gear.innerHTML = '<span class="nav-icon">⚙️</span> Configuración';
     gear.onclick   = () => App.navigateTo('perfil');
 
     this.navigateTo('inicio');
@@ -110,6 +112,7 @@ const App = {
 
     const titles = {
       inicio:         'Inicio',
+      clases:         'Clases',
       tareas:         'Tareas',
       recursos:       'Recursos',
       calificaciones: 'Calificaciones',
@@ -140,8 +143,10 @@ const App = {
     existingBtns.forEach(b => b.remove());
 
     const isDocente = this.currentUser.role === 'docente';
-    if (viewId === 'tareas' && isDocente)   this._addTopbarBtn(container, '<span class="material-symbols-outlined">add_circle</span> Nueva tarea',     () => ModTareas.openModal());
-    if (viewId === 'recursos' && isDocente) this._addTopbarBtn(container, '<span class="material-symbols-outlined">create_new_folder</span> Agregar recurso', () => openModal('modal-recurso'));
+    if (viewId === 'tareas' && isDocente)   this._addTopbarBtn(container, '➕ Nueva tarea',     () => ModTareas.openModal());
+    if (viewId === 'recursos' && isDocente) this._addTopbarBtn(container, '📁 Agregar recurso', () => openRecursoModal());
+    if (viewId === 'clases' && isDocente)   this._addTopbarBtn(container, '🏫 Nueva clase',     () => ModCrearClase.open());
+    if (viewId === 'clases' && !isDocente)  this._addTopbarBtn(container, '🔑 Unirse a clase',  () => ModUnirseClase.open());
   },
 
   _addTopbarBtn(container, label, fn) {
@@ -187,7 +192,11 @@ const App = {
 };
 
 /* ── Arrancar la app cuando el DOM esté listo ── */
-document.addEventListener('DOMContentLoaded', () => App.init());
+document.addEventListener('DOMContentLoaded', () => {
+  const savedPx = parseInt(localStorage.getItem('miaula_font_size_px'));
+  if (savedPx) document.documentElement.style.fontSize = savedPx + 'px';
+  App.init();
+});
 
 /* ═══════════════════════════════════════
    Dark Mode — inicialización y persistencia

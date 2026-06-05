@@ -4,52 +4,133 @@
 ═══════════════════════════════════════ */
 
 const ViewRecursos = {
-  COLORS: ['#E8EFFE','#E2F7F0','#FFF0EB','#FFF8E0','#EDE9FE'],
+  filterClass: null,
+  filterTipo:  null,
+
+  TYPE_ICON: {
+    '📄 PDF':            '📄',
+    '📝 DOCX':           '📝',
+    '📊 PPTX':           '📊',
+    '🖼 Imagen':         '🖼',
+    '🗜 ZIP':            '🗜',
+    '🔗 Enlace externo': '🔗',
+  },
+
+  TYPE_COLOR: {
+    '📄 PDF':            '#FEECEB',
+    '📝 DOCX':           '#E8EFFE',
+    '📊 PPTX':           '#FFF0EB',
+    '🖼 Imagen':         '#E2F7F0',
+    '🗜 ZIP':            '#FFF8E0',
+    '🔗 Enlace externo': '#EDE9FE',
+  },
 
   render() {
     const el        = document.getElementById('recursos-content');
     const isDocente = App.currentUser.role === 'docente';
+    this._renderFilters(el, isDocente);
+    this._renderList(el, isDocente);
+  },
 
-    if (!DB.recursos.length) {
-      el.innerHTML = emptyState('<span class="material-symbols-outlined">folder_open</span>', 'Sin recursos', isDocente
+  _renderFilters(container, isDocente) {
+    let bar = document.getElementById('rec-filter-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'rec-filter-bar';
+      bar.className = 'rec-filter-bar';
+      container.parentNode.insertBefore(bar, container);
+    }
+
+    const clases = isDocente
+      ? DB.clases.filter(c => c.docenteId === App.currentUser.id)
+      : DB.clases.filter(c => (c.miembros || []).includes(App.currentUser.id));
+
+    const tipoOpts = ['📄 PDF','📝 DOCX','📊 PPTX','🖼 Imagen','🗜 ZIP','🔗 Enlace externo'];
+
+    const claseOpts = clases.map(c =>
+      `<option value="${c.id}" ${this.filterClass === c.id ? 'selected':''}>${c.nombre}</option>`
+    ).join('');
+
+    const tipoOptsHtml = tipoOpts.map(t =>
+      `<option value="${t}" ${this.filterTipo === t ? 'selected':''}>${t}</option>`
+    ).join('');
+
+    bar.innerHTML = `
+      <div class="rec-filters">
+        <div class="filter-row">
+          <label class="filter-label">🏫 Clase:</label>
+          <select class="form-select filter-select" onchange="ViewRecursos._setClass(this.value)">
+            <option value="" ${!this.filterClass?'selected':''}>Todas las clases</option>
+            ${claseOpts}
+          </select>
+        </div>
+        <div class="filter-row">
+          <label class="filter-label">📂 Tipo:</label>
+          <select class="form-select filter-select" onchange="ViewRecursos._setTipo(this.value)">
+            <option value="" ${!this.filterTipo?'selected':''}>Todos los tipos</option>
+            ${tipoOptsHtml}
+          </select>
+        </div>
+      </div>`;
+  },
+
+  _setClass(val) {
+    this.filterClass = val ? +val : null;
+    this._renderList(document.getElementById('recursos-content'), App.currentUser.role === 'docente');
+  },
+
+  _setTipo(val) {
+    this.filterTipo = val || null;
+    this._renderList(document.getElementById('recursos-content'), App.currentUser.role === 'docente');
+  },
+
+  _renderList(el, isDocente) {
+    let recursos = [...DB.recursos];
+    if (this.filterClass) recursos = recursos.filter(r => r.classId === this.filterClass);
+    if (this.filterTipo)  recursos = recursos.filter(r => r.tipo === this.filterTipo);
+
+    if (!recursos.length) {
+      el.innerHTML = emptyState('📁', 'Sin recursos', isDocente
         ? 'Agrega el primer recurso con el botón de arriba.'
-        : 'El docente aún no ha subido recursos.');
+        : 'No hay recursos disponibles con estos filtros.');
       return;
     }
 
-    el.innerHTML = `<div class="resources-list">${DB.recursos.map((r, i) => this._card(r, i, isDocente)).join('')}</div>`;
+    el.innerHTML = `<div class="rec-list">${recursos.map(r => this._card(r, isDocente)).join('')}</div>`;
   },
 
-  _card(r, i, isDocente) {
-    const bg = this.COLORS[i % this.COLORS.length];
-
-    const tipoIconos = {
-      'PDF':          'picture_as_pdf',
-      'Presentación': 'slideshow',
-      'Video':        'videocam',
-      'Enlace':       'link',
-      'Documento':    'description',
-    };
-    const iconName = tipoIconos[r.tipo] || 'folder_open';
-    const tipoIcon = `<span class="material-symbols-outlined">${iconName}</span>`;
-
-    const delBtn = isDocente
-      ? `<button class="btn-danger btn-sm" onclick="ViewRecursos.eliminar(${r.id})"><span class="material-symbols-outlined">delete</span> Eliminar</button>`
+  _card(r, isDocente) {
+    const icon    = this.TYPE_ICON[r.tipo]  || '📁';
+    const bg      = this.TYPE_COLOR[r.tipo] || '#F3F4F6';
+    const clase   = r.classId ? DB.clases.find(c => c.id === r.classId) : null;
+    const isLink  = r.tipo === '🔗 Enlace externo';
+    const delBtn  = isDocente
+      ? `<button class="btn-rec-delete" onclick="ViewRecursos.eliminar(${r.id})">🗑 Eliminar</button>`
       : '';
+    const openBtn = isLink && r.url
+      ? `<a class="btn-rec-action" href="${r.url}" target="_blank" rel="noopener">🔗 Abrir</a>`
+      : r.fileName
+        ? `<button class="btn-rec-action" onclick="showToast('Archivo: ${r.fileName}')">⬇ Descargar</button>`
+        : `<button class="btn-rec-action">⬇ Descargar</button>`;
+    const fileTag = r.fileName
+      ? `<span class="rec-filename" title="${r.fileName}">📎 ${r.fileName}</span>`
+      : '';
+
     return `
-      <div class="resource-card fade-up">
-        <div class="resource-card-header">
-          <div class="resource-icon" style="background:${bg}">${tipoIcon}</div>
-          <div class="resource-card-body">
-            <div class="resource-name">${r.nombre}</div>
-            <div class="resource-meta">${tipoIcon} ${r.tipo} &nbsp;·&nbsp; ${r.materia} &nbsp;·&nbsp; ${formatDate(r.fecha)}</div>
+      <div class="rec-card fade-up">
+        <div class="rec-icon" style="background:${bg}">${icon}</div>
+        <div class="rec-info">
+          <div class="rec-name">${r.nombre}</div>
+          <div class="rec-meta">
+            <span class="rec-tipo-badge">${r.tipo}</span>
+            ${clase ? `<span class="rec-clase-badge" style="background:${clase.color||'var(--brand-light)'};color:${clase.color?'#fff':'var(--brand)'}">🏫 ${clase.nombre}</span>` : ''}
+            ${fileTag}
+            <span>📅 ${formatDate(r.fecha)}</span>
           </div>
+          ${r.desc ? `<div class="rec-desc">${r.desc}</div>` : ''}
         </div>
-        ${r.desc ? `<div class="resource-desc">${r.desc}</div>` : ''}
-        <div class="resource-actions">
-          <button class="resource-dl-btn" title="Descargar">
-            <span class="material-symbols-outlined">download</span>
-          </button>
+        <div class="rec-actions">
+          ${openBtn}
           ${delBtn}
         </div>
       </div>`;
@@ -60,25 +141,93 @@ const ViewRecursos = {
     try {
       await apiCall('delete_recurso', { id });
       DB.recursos = DB.recursos.filter(r => r.id !== id);
-      this.render();
+      this._renderList(document.getElementById('recursos-content'), true);
     } catch(err) { alert(err.message); }
   },
+
+  _onFileChange(input) {
+    const nameEl = document.getElementById('r-file-name');
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      nameEl.textContent = file.name;
+      // Auto-fill nombre if empty
+      const nombreEl = document.getElementById('r-nombre');
+      if (!nombreEl.value) nombreEl.value = file.name.replace(/\.[^.]+$/, '');
+      // Auto-detect tipo
+      const ext = file.name.split('.').pop().toLowerCase();
+      const tipoMap = { pdf:'📄 PDF', docx:'📝 DOCX', pptx:'📊 PPTX', jpg:'🖼 Imagen', jpeg:'🖼 Imagen', png:'🖼 Imagen', zip:'🗜 ZIP' };
+      if (tipoMap[ext]) {
+        document.getElementById('r-tipo').value = tipoMap[ext];
+        this._toggleFileUrl(tipoMap[ext]);
+      }
+    } else {
+      nameEl.textContent = 'Ningún archivo seleccionado';
+    }
+  },
+
+  _toggleFileUrl(tipo) {
+    const isLink = tipo === '🔗 Enlace externo';
+    document.getElementById('r-file-group').style.display = isLink ? 'none' : '';
+    document.getElementById('r-url-group').style.display  = isLink ? '' : 'none';
+  },
 };
+
+/** Abre el modal de recurso preparando los selects */
+function openRecursoModal() {
+  document.getElementById('r-nombre').value    = '';
+  document.getElementById('r-desc').value      = '';
+  document.getElementById('r-url').value       = '';
+  document.getElementById('r-file').value      = '';
+  document.getElementById('r-file-name').textContent = 'Ningún archivo seleccionado';
+  document.getElementById('r-tipo').value      = '📄 PDF';
+  ViewRecursos._toggleFileUrl('📄 PDF');
+
+  const clases = DB.clases.filter(c => c.docenteId === App.currentUser.id);
+  const sel = document.getElementById('r-clase');
+  sel.innerHTML = '<option value="">— Sin clase —</option>' +
+    clases.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+  sel.value = '';
+
+  // Escuchar cambio de tipo para alternar file/url
+  const tipoSel = document.getElementById('r-tipo');
+  tipoSel.onchange = () => ViewRecursos._toggleFileUrl(tipoSel.value);
+
+  openModal('modal-recurso');
+}
 
 /** Guarda nuevo recurso desde el modal */
 async function saveRecurso() {
   const nombre = fieldVal('r-nombre');
   if (!nombre) { alert('El nombre es requerido.'); return; }
+
+  const tipo    = document.getElementById('r-tipo').value;
+  const isLink  = tipo === '🔗 Enlace externo';
+  const fileEl  = document.getElementById('r-file');
+  const hasFile = fileEl.files && fileEl.files.length > 0;
+
+  let fileName = '';
+  if (!isLink && hasFile) {
+    fileName = fileEl.files[0].name;
+  }
+
   const recurso = {
     nombre,
-    materia:   fieldVal('r-materia'),
-    tipo:      document.getElementById('r-tipo').value,
-    desc:      fieldVal('r-desc'),
+    tipo,
+    url:      isLink ? fieldVal('r-url') : '',
+    fileName: fileName,
+    classId:  document.getElementById('r-clase').value || null,
+    desc:     fieldVal('r-desc'),
     docenteId: App.currentUser.id,
   };
+
   try {
     const res = await apiCall('save_recurso', { recurso });
-    DB.recursos.push({ ...recurso, id: res.id, fecha: new Date().toISOString().slice(0,10) });
+    DB.recursos.push({
+      ...recurso,
+      id: res.id,
+      classId: recurso.classId ? +recurso.classId : null,
+      fecha: new Date().toISOString().slice(0, 10),
+    });
     closeModal('modal-recurso');
     ViewRecursos.render();
   } catch(err) { alert(err.message); }
@@ -104,7 +253,7 @@ const ViewCalificaciones = {
     const alumnos = DB.users.filter(u => u.role === 'alumno');
 
     if (!alumnos.length) {
-      el.innerHTML = emptyState('<span class="material-symbols-outlined">group</span>', 'Sin alumnos', 'No hay alumnos registrados.');
+      el.innerHTML = emptyState('📊', 'Sin alumnos', 'No hay alumnos registrados.');
       return;
     }
 
@@ -145,7 +294,7 @@ const ViewCalificaciones = {
     const califs  = DB.entregas.filter(e => e.alumnoId === uid && e.calificacion != null);
 
     if (!califs.length) {
-      el.innerHTML = emptyState('<span class="material-symbols-outlined">analytics</span>', 'Sin calificaciones', 'Aún no tienes calificaciones registradas.');
+      el.innerHTML = emptyState('📊', 'Sin calificaciones', 'Aún no tienes calificaciones registradas.');
       return;
     }
 
@@ -157,9 +306,9 @@ const ViewCalificaciones = {
           <div class="nota-circle ${cls}">${e.calificacion}</div>
           <div class="nota-info">
             <div class="nota-materia">${tarea.titulo || '?'}</div>
-            <div class="nota-tarea"><span class="material-symbols-outlined">menu_book</span> ${tarea.materia || ''}</div>
-            <div class="nota-fecha"><span class="material-symbols-outlined">calendar_today</span> Calificada: ${formatDate(e.fecha)} &nbsp;·&nbsp; Máximo: ${tarea.puntos} pts</div>
-            ${e.feedback ? `<div class="nota-comentario"><span class="material-symbols-outlined">chat</span> "${e.feedback}"</div>` : ''}
+            <div class="nota-tarea">📚 ${tarea.materia || ''}</div>
+            <div class="nota-fecha">📅 Calificada: ${formatDate(e.fecha)} &nbsp;·&nbsp; Máximo: ${tarea.puntos} pts</div>
+            ${e.feedback ? `<div class="nota-comentario">💬 "${e.feedback}"</div>` : ''}
           </div>
         </div>`;
     }).join('')}</div>`;
@@ -260,7 +409,7 @@ const ViewMensajes = {
           const isMe = m.from === App.currentUser.id;
           return `<div><div class="bubble ${isMe ? 'me' : 'them'}">${m.text}<div class="bubble-time">${m.hora}</div></div></div>`;
         }).join('')
-      : emptyState('<span class="material-symbols-outlined">forum</span>', 'Sin mensajes', 'Sé el primero en escribir.');
+      : emptyState('💬', 'Sin mensajes', 'Sé el primero en escribir.');
 
     body.scrollTop = body.scrollHeight;
   },
@@ -314,7 +463,7 @@ const ViewAlumnos = {
     const alumnos = DB.users.filter(u => u.role === 'alumno');
 
     if (!alumnos.length) {
-      el.innerHTML = emptyState('<span class="material-symbols-outlined">school</span>', 'Sin alumnos registrados', 'Los alumnos aparecerán aquí al crear su cuenta.');
+      el.innerHTML = emptyState('🎓', 'Sin alumnos registrados', 'Los alumnos aparecerán aquí al crear su cuenta.');
       return;
     }
 
@@ -341,7 +490,7 @@ const ViewAlumnos = {
           <td>
             <button class="btn-secondary btn-sm"
               onclick="ViewMensajes.activeContact=${a.id}; App.navigateTo('mensajes')">
-              <span class="material-symbols-outlined">chat</span> Mensaje
+              💬 Mensaje
             </button>
           </td>
         </tr>`;

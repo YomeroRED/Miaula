@@ -5,6 +5,7 @@
 
 const ModTareas = {
   activeTab:      'todas',
+  activeClass:    null,
   editingId:      null,
   entregaTareaId: null,
   calificarEntId: null,
@@ -14,8 +15,46 @@ const ViewTareas = {
 
   render() {
     const isDocente = App.currentUser.role === 'docente';
+    this._renderClassFilter(isDocente);
     this._renderTabs(isDocente);
     this._renderContent(isDocente);
+  },
+
+  // ── Filtro por clase ───────────────────
+  _renderClassFilter(isDocente) {
+    const container = document.getElementById('tareas-content');
+    // Insertar selector antes del contenido si no existe
+    let filterEl = document.getElementById('tareas-class-filter');
+    if (!filterEl) {
+      filterEl = document.createElement('div');
+      filterEl.id = 'tareas-class-filter';
+      filterEl.className = 'tareas-class-filter';
+      container.parentNode.insertBefore(filterEl, container);
+    }
+
+    const clases = isDocente
+      ? DB.clases.filter(c => c.docenteId === App.currentUser.id)
+      : DB.clases.filter(c => (c.miembros || []).includes(App.currentUser.id));
+
+    if (!clases.length) { filterEl.innerHTML = ''; return; }
+
+    const opts = clases.map(c =>
+      `<option value="${c.id}" ${ModTareas.activeClass === c.id ? 'selected' : ''}>${escHtml(c.nombre)}</option>`
+    ).join('');
+
+    filterEl.innerHTML = `
+      <div class="filter-row">
+        <label class="filter-label">🏫 Clase:</label>
+        <select class="form-select filter-select" onchange="ViewTareas.setClass(this.value)">
+          <option value="" ${!ModTareas.activeClass ? 'selected' : ''}>Todas las clases</option>
+          ${opts}
+        </select>
+      </div>`;
+  },
+
+  setClass(val) {
+    ModTareas.activeClass = val ? +val : null;
+    this._renderContent(App.currentUser.role === 'docente');
   },
 
   // ── Tabs ───────────────────────────────
@@ -43,11 +82,13 @@ const ViewTareas = {
 
     if (isDocente) {
       if (ModTareas.activeTab === 'todas') {
-        if (!DB.tareas.length) {
-          el.innerHTML = emptyState('<span class="material-symbols-outlined">assignment</span>', 'Sin tareas', 'Crea tu primera tarea con el botón de arriba.');
+        let tareas = [...DB.tareas];
+        if (ModTareas.activeClass) tareas = tareas.filter(t => t.classId === ModTareas.activeClass);
+        if (!tareas.length) {
+          el.innerHTML = emptyState('📋', 'Sin tareas', 'Crea tu primera tarea con el botón de arriba.');
           return;
         }
-        el.innerHTML = `<div class="cards-grid">${DB.tareas.map(t => this.cardDocente(t)).join('')}</div>`;
+        el.innerHTML = `<div class="cards-grid">${tareas.map(t => this.cardDocente(t)).join('')}</div>`;
       } else {
         this._renderEntregas(el);
       }
@@ -55,12 +96,13 @@ const ViewTareas = {
       let tareas = [...DB.tareas];
       const uid  = App.currentUser.id;
 
+      if (ModTareas.activeClass) tareas = tareas.filter(t => t.classId === ModTareas.activeClass);
       if (ModTareas.activeTab === 'pendientes')
         tareas = tareas.filter(t => !DB.entregas.find(e => e.tareaId === t.id && e.alumnoId === uid));
       if (ModTareas.activeTab === 'entregadas')
         tareas = tareas.filter(t =>  DB.entregas.find(e => e.tareaId === t.id && e.alumnoId === uid));
 
-      if (!tareas.length) { el.innerHTML = emptyState('<span class="material-symbols-outlined">check_circle</span>', 'Nada aquí', ''); return; }
+      if (!tareas.length) { el.innerHTML = emptyState('✅', 'Nada aquí', ''); return; }
       el.innerHTML = `<div class="cards-grid">${tareas.map(t => this.cardAlumno(t)).join('')}</div>`;
     }
   },
@@ -69,27 +111,28 @@ const ViewTareas = {
   cardDocente(t) {
     const entregas    = DB.entregas.filter(e => e.tareaId === t.id);
     const calificadas = entregas.filter(e => e.calificacion != null).length;
+    const clase       = t.classId ? DB.clases.find(c => c.id === t.classId) : null;
 
     return `
       <div class="task-card fade-up">
         <div class="task-card-header">
           <div>
             <div class="task-card-title">${t.titulo}</div>
-            <div class="task-card-materia"><span class="material-symbols-outlined">menu_book</span> ${t.materia}</div>
+            <div class="task-card-materia">📚 ${t.materia}${clase ? ` &nbsp;·&nbsp; 🏫 ${escHtml(clase.nombre)}` : ''}</div>
           </div>
           <span class="badge badge-active">Activa</span>
         </div>
         <div class="task-card-desc">${t.desc || 'Sin descripción.'}</div>
         <div class="task-info-row">
-          <span><span class="material-symbols-outlined">inbox</span> ${entregas.length} entregas</span>
-          <span><span class="material-symbols-outlined">check_circle</span> ${calificadas} calificadas</span>
-          <span><span class="material-symbols-outlined">military_tech</span> ${t.puntos} pts</span>
+          <span>📬 ${entregas.length} entregas</span>
+          <span>✅ ${calificadas} calificadas</span>
+          <span>🏆 ${t.puntos} pts</span>
         </div>
         <div class="task-card-footer">
-          <div class="task-card-due"><span class="material-symbols-outlined">calendar_today</span> ${formatDate(t.fecha)}</div>
+          <div class="task-card-due">📅 ${formatDate(t.fecha)}</div>
           <div class="task-actions">
-            <button class="btn-secondary btn-sm" onclick="ModTareas.openModal(${t.id})"><span class="material-symbols-outlined">edit</span> Editar</button>
-            <button class="btn-danger btn-sm"    onclick="ViewTareas.eliminar(${t.id})"><span class="material-symbols-outlined">delete</span></button>
+            <button class="btn-secondary btn-sm" onclick="ModTareas.openModal(${t.id})">✏️ Editar</button>
+            <button class="btn-danger btn-sm"    onclick="ViewTareas.eliminar(${t.id})">🗑</button>
           </div>
         </div>
       </div>`;
@@ -108,17 +151,17 @@ const ViewTareas = {
 
     if (!entrega) {
       badge   = `<span class="badge ${late ? 'badge-late' : 'badge-pending'}">${late ? 'Tardía' : 'Pendiente'}</span>`;
-      actions = `<button class="btn-action btn-sm" onclick="ModEntrega.open(${t.id})"><span class="material-symbols-outlined">upload_file</span> Entregar</button>`;
+      actions = `<button class="btn-action btn-sm" onclick="ModEntrega.open(${t.id})">📤 Entregar</button>`;
     } else if (entrega.calificacion != null) {
       badge   = `<span class="badge badge-graded">Calificada</span>`;
-      actions = `<span style="font-size:13px;font-weight:600;color:var(--green)"><span class="material-symbols-outlined">grade</span> ${entrega.calificacion}/${t.puntos}</span>`;
+      actions = `<span style="font-size:13px;font-weight:600;color:var(--green)">📊 ${entrega.calificacion}/${t.puntos}</span>`;
     } else {
       badge   = `<span class="badge badge-submitted">Entregada</span>`;
       actions = `<span style="font-size:12px;color:var(--text-muted)">En revisión...</span>`;
     }
 
     const feedbackRow = entrega && entrega.calificacion != null && entrega.feedback
-      ? `<div class="task-card-desc" style="color:var(--green);font-style:italic"><span class="material-symbols-outlined">chat</span> "${entrega.feedback}"</div>`
+      ? `<div class="task-card-desc" style="color:var(--green);font-style:italic">💬 "${entrega.feedback}"</div>`
       : '';
 
     return `
@@ -126,14 +169,14 @@ const ViewTareas = {
         <div class="task-card-header">
           <div>
             <div class="task-card-title">${t.titulo}</div>
-            <div class="task-card-materia"><span class="material-symbols-outlined">menu_book</span> ${t.materia}</div>
+            <div class="task-card-materia">📚 ${t.materia}</div>
           </div>
           ${badge}
         </div>
         <div class="task-card-desc">${t.desc || 'Sin descripción.'}</div>
         ${feedbackRow}
         <div class="task-card-footer">
-          <div class="task-card-due"><span class="material-symbols-outlined">calendar_today</span> ${formatDate(t.fecha)} · <span class="material-symbols-outlined">military_tech</span> ${t.puntos} pts</div>
+          <div class="task-card-due">📅 ${formatDate(t.fecha)} · 🏆 ${t.puntos} pts</div>
           <div class="task-actions">${actions}</div>
         </div>
       </div>`;
@@ -142,7 +185,7 @@ const ViewTareas = {
   // ── Tabla de entregas (docente) ────────
   _renderEntregas(el) {
     if (!DB.entregas.length) {
-      el.innerHTML = emptyState('<span class="material-symbols-outlined">inbox</span>', 'Sin entregas aún', 'Los alumnos aún no han enviado trabajos.');
+      el.innerHTML = emptyState('📬', 'Sin entregas aún', 'Los alumnos aún no han enviado trabajos.');
       return;
     }
 
@@ -150,10 +193,10 @@ const ViewTareas = {
       const tarea  = DB.tareas.find(t => t.id === e.tareaId) || {};
       const alumno = DB.users.find(u => u.id === e.alumnoId) || {};
       const calBadge = e.calificacion != null
-        ? `<span class="badge badge-graded"><span class="material-symbols-outlined">check_circle</span> ${e.calificacion}/${tarea.puntos}</span>`
+        ? `<span class="badge badge-graded">✅ ${e.calificacion}/${tarea.puntos}</span>`
         : `<span class="badge badge-pending">Sin calificar</span>`;
       const btnCal = e.calificacion == null
-        ? `<button class="btn-action btn-sm" onclick="ModCalificar.open(${e.id})"><span class="material-symbols-outlined">grade</span> Calificar</button>`
+        ? `<button class="btn-action btn-sm" onclick="ModCalificar.open(${e.id})">📊 Calificar</button>`
         : '—';
 
       return `
@@ -195,6 +238,12 @@ ModTareas.openModal = function(id) {
   ModTareas.editingId = id || null;
   document.getElementById('modal-tarea-title').textContent = id ? 'Editar tarea' : 'Nueva tarea';
 
+  // Populate class selector
+  const clases = DB.clases.filter(c => c.docenteId === App.currentUser.id);
+  const sel = document.getElementById('t-clase');
+  sel.innerHTML = '<option value="">— Sin clase —</option>' +
+    clases.map(c => `<option value="${c.id}">${escHtml(c.nombre)}</option>`).join('');
+
   if (id) {
     const t = DB.tareas.find(t => t.id === id) || {};
     document.getElementById('t-titulo').value  = t.titulo  || '';
@@ -202,9 +251,11 @@ ModTareas.openModal = function(id) {
     document.getElementById('t-materia').value = t.materia || '';
     document.getElementById('t-fecha').value   = t.fecha   || '';
     document.getElementById('t-puntos').value  = t.puntos  || 100;
+    sel.value = t.classId || '';
   } else {
     ['t-titulo','t-desc','t-materia','t-fecha'].forEach(fid => document.getElementById(fid).value = '');
     document.getElementById('t-puntos').value = '100';
+    sel.value = '';
   }
   openModal('modal-tarea');
 };
@@ -215,18 +266,19 @@ ModTareas.save = async function() {
   const fecha   = fieldVal('t-fecha');
   if (!titulo || !materia || !fecha) { alert('Completa los campos requeridos (*).'); return; }
 
-  const desc   = fieldVal('t-desc');
-  const puntos = parseInt(document.getElementById('t-puntos').value) || 100;
-  const tarea  = { titulo, desc, materia, fecha, puntos, docenteId: App.currentUser.id };
+  const desc    = fieldVal('t-desc');
+  const puntos  = parseInt(document.getElementById('t-puntos').value) || 100;
+  const classId = document.getElementById('t-clase').value ? +document.getElementById('t-clase').value : null;
+  const tarea   = { titulo, desc, materia, fecha, puntos, classId, docenteId: App.currentUser.id };
   if (ModTareas.editingId) tarea.id = ModTareas.editingId;
 
   try {
     const res = await apiCall('save_tarea', { tarea });
     if (ModTareas.editingId) {
       const t = DB.tareas.find(t => t.id === ModTareas.editingId);
-      if (t) Object.assign(t, { titulo, desc, materia, fecha, puntos });
+      if (t) Object.assign(t, { titulo, desc, materia, fecha, puntos, classId });
     } else {
-      DB.tareas.push({ id: res.id, titulo, desc, materia, fecha, puntos, docenteId: App.currentUser.id });
+      DB.tareas.push({ id: res.id, titulo, desc, materia, fecha, puntos, classId, docenteId: App.currentUser.id });
     }
     closeModal('modal-tarea');
     ViewTareas.render();
@@ -239,7 +291,7 @@ const ModEntrega = {
     ModTareas.entregaTareaId = tareaId;
     const t = DB.tareas.find(t => t.id === tareaId) || {};
     document.getElementById('entrega-tarea-info').innerHTML =
-      `<strong>${t.titulo}</strong><br><span class="material-symbols-outlined">menu_book</span> ${t.materia} &nbsp;·&nbsp; <span class="material-symbols-outlined">calendar_today</span> ${formatDate(t.fecha)} &nbsp;·&nbsp; <span class="material-symbols-outlined">military_tech</span> ${t.puntos} pts`;
+      `<strong>${t.titulo}</strong><br>📚 ${t.materia} &nbsp;·&nbsp; 📅 ${formatDate(t.fecha)} &nbsp;·&nbsp; 🏆 ${t.puntos} pts`;
     document.getElementById('e-comentario').value = '';
     openModal('modal-entrega');
   },

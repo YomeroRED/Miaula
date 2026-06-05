@@ -18,35 +18,42 @@ const ViewInicio = {
     const el = document.getElementById('stats-grid');
 
     if (isDocente) {
-      const tareasCount   = DB.tareas.length;
-      const entregas      = DB.entregas.length;
+      const tareasTotal   = DB.tareas.length;
+      const entregasTotal = DB.entregas.length;
       const calificadas   = DB.entregas.filter(e => e.calificacion != null).length;
+      const porCalificar  = entregasTotal - calificadas;
       const recursos      = DB.recursos.length;
+      const alumnos       = DB.users.filter(u => u.role === 'alumno').length;
 
       el.innerHTML = `
-        ${this._stat('blue',  '<span class="material-symbols-outlined">assignment_turned_in</span>', 'Tareas publicadas',    tareasCount,  'este ciclo')}
-        ${this._stat('green', '<span class="material-symbols-outlined">mark_email_read</span>', 'Entregas recibidas',   entregas,     `de ${DB.users.filter(u => u.role==='alumno').length} alumno(s)`)}
-        ${this._stat('amber', '<span class="material-symbols-outlined">pending_actions</span>', 'Por calificar',        entregas - calificadas, 'pendientes')}
-        ${this._stat('red',   '<span class="material-symbols-outlined">folder_open</span>', 'Recursos disponibles', recursos,     'publicados')}
+        ${this._stat('blue',  '✅', 'Tareas publicadas',   tareasTotal + ' publicadas',              'este ciclo')}
+        ${this._stat('green', '📬', 'Entregas recibidas',  calificadas + ' / ' + entregasTotal,      'calificadas / recibidas')}
+        ${this._stat('amber', '📝', 'Por calificar',       porCalificar + ' / ' + entregasTotal,     'pendientes de revisión')}
+        ${this._stat('info',  '📁', 'Recursos publicados', recursos + ' publicados',                 'disponibles para alumnos')}
       `;
     } else {
       const total      = DB.tareas.length;
-      const pending    = pendingCount(user.id);
       const entregadas = DB.entregas.filter(e => e.alumnoId === user.id).length;
+      const pending    = total - entregadas;
       const califs     = DB.entregas.filter(e => e.alumnoId === user.id && e.calificacion != null).length;
+      const hoy        = new Date().toISOString().slice(0,10);
+      const vencidas   = DB.tareas.filter(t =>
+        !DB.entregas.find(e => e.tareaId === t.id && e.alumnoId === user.id) &&
+        t.fecha && t.fecha < hoy
+      ).length;
 
       el.innerHTML = `
-        ${this._stat('blue',  '<span class="material-symbols-outlined">assignment</span>', 'Tareas activas',   total,      'asignadas')}
-        ${this._stat('amber', '<span class="material-symbols-outlined">hourglass_empty</span>', 'Pendientes',        pending,    'sin entregar')}
-        ${this._stat('green', '<span class="material-symbols-outlined">task_alt</span>', 'Entregadas',        entregadas, 'completadas')}
-        ${this._stat('red',   '<span class="material-symbols-outlined">grade</span>', 'Calificadas',       califs,     'con nota')}
+        ${this._stat('blue',  '📋', 'Tareas totales',  entregadas + ' / ' + total,  'completadas / total')}
+        ${this._stat('amber', '⏳', 'Pendientes',       pending + ' / ' + total,     'sin entregar')}
+        ${this._stat('green', '✅', 'Entregadas',       entregadas + ' / ' + total,  'realizadas / total')}
+        ${this._stat('red',   '🚨', 'Vencidas',         vencidas + ' / ' + total,    'requieren atención')}
       `;
     }
   },
 
   _stat(color, icon, label, value, sub) {
     return `
-      <div class="stat-card ${color}">
+      <div class="stat-card stat-card--${color}">
         <div class="stat-icon">${icon}</div>
         <div class="stat-label">${label}</div>
         <div class="stat-value">${value}</div>
@@ -63,7 +70,7 @@ const ViewInicio = {
       titleEl.textContent = 'Tareas recientes';
       const tareas = DB.tareas.slice(-3).reverse();
       if (!tareas.length) {
-        contentEl.innerHTML = emptyState('<span class="material-symbols-outlined">assignment</span>', 'Sin tareas aún', 'Crea tu primera tarea desde el menú "Tareas".');
+        contentEl.innerHTML = emptyState('📋', 'Sin tareas aún', 'Crea tu primera tarea desde el menú "Tareas".');
         return;
       }
       contentEl.innerHTML = `<div class="cards-grid">${tareas.map(t => ViewTareas.cardDocente(t)).join('')}</div>`;
@@ -74,7 +81,7 @@ const ViewInicio = {
         .slice(0, 3);
 
       if (!proximas.length) {
-        contentEl.innerHTML = emptyState('<span class="material-symbols-outlined">celebration</span>', '¡Al día!', 'No tienes tareas pendientes por entregar.');
+        contentEl.innerHTML = emptyState('🎉', '¡Al día!', 'No tienes tareas pendientes por entregar.');
         return;
       }
       contentEl.innerHTML = `<div class="cards-grid">${proximas.map(t => ViewTareas.cardAlumno(t)).join('')}</div>`;

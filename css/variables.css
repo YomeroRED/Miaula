@@ -55,16 +55,26 @@
   /* Sombras */
   --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+
+  /* Font scale — controlled via JS, default 1 */
+  --font-scale: 1;
+}
+
+/* ── Font scale — only html font-size changes, layout uses px/% ─ */
+html {
+  font-size: 1rem; /* overridden by JS via style.fontSize */
 }
 
 body {
   font-family: var(--font);
   background: var(--surface);
   color: var(--text);
-  font-size: 14px;
+  font-size: 1rem;
   line-height: 1.6;
   min-height: 100vh;
 }
+
+/* Remove scale classes — html font-size is set directly by JS */
 
 /* ── Animaciones ── */
 @keyframes fadeUp {
@@ -81,7 +91,7 @@ body {
 .mb-28       { margin-bottom: 28px; }
 .grid-2      { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .text-muted  { color: var(--text-muted); }
-.text-sm     { font-size: 12px; }
+.text-sm     { font-size: 0.86rem; }
 .fw-500      { font-weight: 500; }
 .divider     { height: 1px; background: var(--border); margin: 20px 0; }
 
@@ -118,7 +128,7 @@ body.dark-mode {
   user-select: none;
 }
 .dm-toggle-icon {
-  font-size: 15px;
+  font-size: 1.07rem;
   line-height: 1;
   transition: transform 0.3s ease;
 }

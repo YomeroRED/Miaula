@@ -35,6 +35,11 @@ const DEMO_MENSAJES_RAW = [
   { user_a:1, user_b:3, from_id:3, texto:'Profesor, ¿cuándo publica los resultados del ejercicio entregado?', hora:'09:00' },
 ];
 
+const DEMO_CLASES = [
+  { id:1, nombre:'Matemáticas III — Grupo A', materia:'Matemáticas III',        desc:'Álgebra lineal, cálculo diferencial e integral.',         codigo:'MAT3A1', docenteId:1, miembros:[2,3], fecha:'2026-01-15' },
+  { id:2, nombre:'Estadística Aplicada',       materia:'Estadística',            desc:'Probabilidad, distribuciones y estadística inferencial.', codigo:'ESTA01', docenteId:1, miembros:[2],   fecha:'2026-01-15' },
+];
+
 const DEMO_NOTAS = [
   { id:1, titulo:'Fórmulas de Álgebra Lineal',     contenido:'- Determinante 2x2: ad - bc\n- Traza: suma de la diagonal principal\n- Transpuesta: filas ↔ columnas', etiqueta:'clase',    autorId:2, fecha:'2026-05-20', fechaMod:'2026-05-20', fijada:true  },
   { id:2, titulo:'Ideas para proyecto final',       contenido:'Propuesta: análisis de datos de ventas con regresión lineal. Incluir visualizaciones.',                                              etiqueta:'proyecto', autorId:2, fecha:'2026-05-22', fechaMod:'2026-05-25', fijada:false },
@@ -69,6 +74,7 @@ function nowTime() {
     lsSet('recursos', DEMO_RECURSOS);
     lsSet('mensajes', DEMO_MENSAJES_RAW);
     lsSet('notas',    DEMO_NOTAS);
+    lsSet('clases',   DEMO_CLASES);
     localStorage.setItem('miaula_seeded', '1');
   }
 })();
@@ -84,6 +90,7 @@ async function apiCall(action, params = {}) {
   const recursos = lsGet('recursos', []);
   const mensajes = lsGet('mensajes', []);
   const notas    = lsGet('notas',    []);
+  const clases   = lsGet('clases',   []);
 
   switch (action) {
 
@@ -119,11 +126,14 @@ async function apiCall(action, params = {}) {
       if (!d.titulo || !d.materia || !d.fecha) throw new Error('Título, materia y fecha son obligatorios.');
       if (d.id) {
         const idx = tareas.findIndex(t => t.id === +d.id);
-        if (idx !== -1) tareas[idx] = { ...tareas[idx], titulo: d.titulo, materia: d.materia, desc: d.desc||'', fecha: d.fecha, puntos: +d.puntos||100 };
+        if (idx !== -1) {
+          tareas[idx] = { ...tareas[idx], titulo: d.titulo, materia: d.materia, desc: d.desc||'', fecha: d.fecha, puntos: +d.puntos||100 };
+          if (d.classId !== undefined) tareas[idx].classId = d.classId ? +d.classId : null;
+        }
         lsSet('tareas', tareas);
         return { ok: true, id: +d.id };
       } else {
-        const t = { id: nextId(tareas), titulo: d.titulo, materia: d.materia, desc: d.desc||'', fecha: d.fecha, puntos: +d.puntos||100, docenteId: +d.docenteId };
+        const t = { id: nextId(tareas), titulo: d.titulo, materia: d.materia, desc: d.desc||'', fecha: d.fecha, puntos: +d.puntos||100, docenteId: +d.docenteId, classId: d.classId ? +d.classId : null };
         tareas.push(t);
         lsSet('tareas', tareas);
         return { ok: true, id: t.id };
@@ -165,7 +175,18 @@ async function apiCall(action, params = {}) {
     case 'save_recurso': {
       const d = params.recurso || {};
       if (!d.nombre) throw new Error('El nombre del recurso es obligatorio.');
-      const r = { id: nextId(recursos), nombre: d.nombre, materia: d.materia||'', tipo: d.tipo||'', desc: d.desc||'', docenteId: +d.docenteId, fecha: today() };
+      const r = {
+        id: nextId(recursos),
+        nombre: d.nombre,
+        materia: d.materia || '',
+        tipo: d.tipo || '',
+        desc: d.desc || '',
+        url: d.url || '',
+        fileName: d.fileName || '',
+        classId: d.classId ? +d.classId : null,
+        docenteId: +d.docenteId,
+        fecha: today(),
+      };
       recursos.push(r);
       lsSet('recursos', recursos);
       return { ok: true, id: r.id };
@@ -254,6 +275,87 @@ async function apiCall(action, params = {}) {
       return { ok: true };
     }
 
+    // ── CLASES ─────────────────────────────────────────────
+    case 'get_clases':
+      return { ok: true, clases };
+
+    case 'create_clase': {
+      const d = params.clase || {};
+      if (!d.nombre || !d.materia) throw new Error('Nombre y materia son obligatorios.');
+      // Generar código único de 6 caracteres
+      function genCode() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let c = '';
+        for (let i = 0; i < 6; i++) c += chars[Math.floor(Math.random() * chars.length)];
+        return c;
+      }
+      let codigo = genCode();
+      while (clases.find(c => c.codigo === codigo)) codigo = genCode();
+      const nueva = {
+        id: nextId(clases),
+        nombre: d.nombre,
+        materia: d.materia,
+        desc: d.desc || '',
+        codigo,
+        docenteId: +d.docenteId,
+        miembros: [],
+        fecha: today(),
+      };
+      clases.push(nueva);
+      lsSet('clases', clases);
+      return { ok: true, clase: nueva };
+    }
+
+    case 'get_clase_by_code': {
+      const c = clases.find(c => c.codigo === params.codigo);
+      if (!c) throw new Error('Código de clase no encontrado.');
+      return { ok: true, clase: c };
+    }
+
+    case 'join_clase': {
+      const idx = clases.findIndex(c => c.codigo === params.codigo);
+      if (idx === -1) throw new Error('Código de clase no encontrado.');
+      const alumnoId = +params.alumnoId;
+      if (!clases[idx].miembros) clases[idx].miembros = [];
+      if (clases[idx].miembros.includes(alumnoId))
+        throw new Error('Ya estás inscrito en esta clase.');
+      clases[idx].miembros.push(alumnoId);
+      lsSet('clases', clases);
+      return { ok: true, clase: clases[idx] };
+    }
+
+    case 'delete_clase': {
+      lsSet('clases', clases.filter(c => c.id !== +params.id));
+      return { ok: true };
+    }
+
+    case 'clone_clase': {
+      const src = clases.find(c => c.id === +params.sourceId);
+      if (!src) throw new Error('Clase origen no encontrada.');
+      function genCode2() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let c = '';
+        for (let i = 0; i < 6; i++) c += chars[Math.floor(Math.random() * chars.length)];
+        return c;
+      }
+      let codigo = genCode2();
+      while (clases.find(c => c.codigo === codigo)) codigo = genCode2();
+      const clonada = {
+        id: nextId(clases),
+        nombre: params.nombre || (src.nombre + ' (copia)'),
+        materia: src.materia,
+        desc: src.desc || '',
+        color: params.color || src.color || '',
+        codigo,
+        docenteId: +params.docenteId,
+        miembros: [],
+        fecha: today(),
+      };
+      clases.push(clonada);
+      lsSet('clases', clases);
+      return { ok: true, clase: clonada };
+    }
+
     default:
       throw new Error(`Acción desconocida: ${action}`);
   }
@@ -261,16 +363,17 @@ async function apiCall(action, params = {}) {
 
 // ── DB — igual interfaz que antes, ahora lee de localStorage ──
 const DB = {
-  users: [], tareas: [], entregas: [], recursos: [], mensajes: {}, notas: [],
+  users: [], tareas: [], entregas: [], recursos: [], mensajes: {}, notas: [], clases: [],
 
   async load(userId) {
-    const [u, t, e, r, m, n] = await Promise.all([
+    const [u, t, e, r, m, n, cl] = await Promise.all([
       apiCall('get_users'),
       apiCall('get_tareas'),
       apiCall('get_entregas'),
       apiCall('get_recursos'),
       apiCall('get_mensajes', { userId }),
       apiCall('get_notas',    { userId }),
+      apiCall('get_clases'),
     ]);
 
     this.users    = u.users;
@@ -278,6 +381,7 @@ const DB = {
     this.entregas = e.entregas;
     this.recursos = r.recursos;
     this.notas    = n.notas;
+    this.clases   = cl.clases;
 
     this.mensajes = {};
     for (const msg of m.mensajes) {

@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MiAula</title>
 
-  <!-- Google Material Symbols — Outlined -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/views.css">
+  <link rel="stylesheet" href="css/clases.css">
+  <link rel="stylesheet" href="css/recursos.css">
+  <link rel="stylesheet" href="css/perfil-gamification.css">
 </head>
 <body>
 
@@ -33,9 +33,7 @@
         <div class="user-name" id="sidebar-uname">Usuario</div>
         <div class="user-meta" id="sidebar-urole">Rol</div>
       </div>
-      <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
-        <span class="material-symbols-outlined">logout</span>
-      </button>
+      <button class="btn-logout" onclick="logout()" title="Cerrar sesión">↩</button>
     </div>
   </aside>
 
@@ -63,6 +61,10 @@
           <span class="section-title" id="home-section-title">Actividades recientes</span>
         </div>
         <div id="home-content"></div>
+      </div>
+
+      <div class="view" id="view-clases">
+        <div id="clases-content"></div>
       </div>
 
       <div class="view" id="view-tareas">
@@ -98,7 +100,7 @@
               <input class="msg-input" id="msg-input"
                      placeholder="Escribe un mensaje..."
                      onkeydown="if(event.key==='Enter') ViewMensajes.send()">
-              <button class="btn-action" onclick="ViewMensajes.send()"><span class="material-symbols-outlined">send</span> Enviar</button>
+              <button class="btn-action" onclick="ViewMensajes.send()">Enviar ↗</button>
             </div>
           </div>
         </div>
@@ -150,10 +152,16 @@
         <label class="form-label">Valor (puntos)</label>
         <input type="number" class="form-input" id="t-puntos" placeholder="100" min="0" max="1000">
       </div>
+      <div class="form-group">
+        <label class="form-label">Clase</label>
+        <select class="form-select" id="t-clase">
+          <option value="">— Sin clase —</option>
+        </select>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-tarea')">Cancelar</button>
-      <button class="btn-action" onclick="ModTareas.save()"><span class="material-symbols-outlined">save</span> Guardar tarea</button>
+      <button class="btn-action" onclick="ModTareas.save()">💾 Guardar tarea</button>
     </div>
   </div>
 </div>
@@ -161,7 +169,7 @@
 <div class="modal-overlay" id="modal-recurso">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">Agregar recurso</div>
+      <div class="modal-title">📁 Agregar recurso</div>
       <button class="modal-close" onclick="closeModal('modal-recurso')">×</button>
     </div>
     <div class="modal-body">
@@ -169,19 +177,37 @@
         <label class="form-label">Nombre del recurso *</label>
         <input type="text" class="form-input" id="r-nombre" placeholder="ej. Presentación Unidad 3" maxlength="120">
       </div>
-      <div class="form-group">
-        <label class="form-label">Materia</label>
-        <input type="text" class="form-input" id="r-materia" placeholder="ej. Estadística" maxlength="80">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Tipo de recurso</label>
+          <select class="form-select" id="r-tipo">
+            <option value="📄 PDF">📄 PDF</option>
+            <option value="📝 DOCX">📝 DOCX</option>
+            <option value="📊 PPTX">📊 PPTX</option>
+            <option value="🖼 Imagen">🖼 Imagen</option>
+            <option value="🗜 ZIP">🗜 ZIP</option>
+            <option value="🔗 Enlace externo">🔗 Enlace externo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Clase</label>
+          <select class="form-select" id="r-clase">
+            <option value="">— Sin clase —</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Tipo de recurso</label>
-        <select class="form-select" id="r-tipo">
-          <option value="PDF"><span class="material-symbols-outlined">picture_as_pdf</span> PDF</option>
-          <option value="Presentación"><span class="material-symbols-outlined">slideshow</span> Presentación</option>
-          <option value="Video"><span class="material-symbols-outlined">videocam</span> Video</option>
-          <option value="Enlace"><span class="material-symbols-outlined">link</span> Enlace</option>
-          <option value="Documento"><span class="material-symbols-outlined">description</span> Documento</option>
-        </select>
+      <div class="form-group" id="r-file-group">
+        <label class="form-label">Archivo</label>
+        <div class="file-pick-row">
+          <button type="button" class="btn-secondary" onclick="document.getElementById('r-file').click()">📂 Seleccionar archivo</button>
+          <span class="file-pick-name" id="r-file-name">Ningún archivo seleccionado</span>
+        </div>
+        <input type="file" id="r-file" accept=".pdf,.docx,.pptx,.jpg,.jpeg,.png,.zip"
+               style="display:none" onchange="ViewRecursos._onFileChange(this)">
+      </div>
+      <div class="form-group" id="r-url-group" style="display:none">
+        <label class="form-label">URL / Enlace externo</label>
+        <input type="url" class="form-input" id="r-url" placeholder="https://..." maxlength="500">
       </div>
       <div class="form-group">
         <label class="form-label">Descripción</label>
@@ -192,7 +218,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-recurso')">Cancelar</button>
-      <button class="btn-action" onclick="saveRecurso()"><span class="material-symbols-outlined">folder_open</span> Agregar recurso</button>
+      <button class="btn-action" onclick="saveRecurso()">📁 Agregar recurso</button>
     </div>
   </div>
 </div>
@@ -200,7 +226,7 @@
 <div class="modal-overlay" id="modal-entrega">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title"><span class="material-symbols-outlined">upload_file</span> Entregar tarea</div>
+      <div class="modal-title">📤 Entregar tarea</div>
       <button class="modal-close" onclick="closeModal('modal-entrega')">×</button>
     </div>
     <div class="modal-body">
@@ -212,7 +238,7 @@
                   maxlength="2000"></textarea>
       </div>
       <div class="adjunto-box">
-        <span class="adjunto-icon"><span class="material-symbols-outlined">attach_file</span></span>
+        <span class="adjunto-icon">📎</span>
         <div>
           <div class="adjunto-label">Adjuntar archivo</div>
           <div class="adjunto-sub">Simulación — en versión real permite subir archivos</div>
@@ -221,7 +247,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-entrega')">Cancelar</button>
-      <button class="btn-success" onclick="ModEntrega.confirm()"><span class="material-symbols-outlined">task_alt</span> Confirmar entrega</button>
+      <button class="btn-success" onclick="ModEntrega.confirm()">✅ Confirmar entrega</button>
     </div>
   </div>
 </div>
@@ -229,7 +255,7 @@
 <div class="modal-overlay" id="modal-calificar">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title"><span class="material-symbols-outlined">grade</span> Calificar entrega</div>
+      <div class="modal-title">📊 Calificar entrega</div>
       <button class="modal-close" onclick="closeModal('modal-calificar')">×</button>
     </div>
     <div class="modal-body">
@@ -253,7 +279,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-calificar')">Cancelar</button>
-      <button class="btn-action" onclick="ModCalificar.save()"><span class="material-symbols-outlined">save</span> Guardar calificación</button>
+      <button class="btn-action" onclick="ModCalificar.save()">💾 Guardar calificación</button>
     </div>
   </div>
 </div>
@@ -277,17 +303,102 @@
         <label class="form-label">Etiqueta</label>
         <select class="form-select" id="n-etiqueta">
           <option value="">— Sin etiqueta —</option>
-          <option value="clase"><span class="material-symbols-outlined">menu_book</span> Clase</option>
-          <option value="examen"><span class="material-symbols-outlined">edit</span> Examen</option>
-          <option value="proyecto"><span class="material-symbols-outlined">folder_special</span> Proyecto</option>
-          <option value="personal"><span class="material-symbols-outlined">person</span> Personal</option>
-          <option value="idea"><span class="material-symbols-outlined">lightbulb</span> Idea</option>
+          <option value="clase">📚 Clase</option>
+          <option value="examen">✏️ Examen</option>
+          <option value="proyecto">🗂 Proyecto</option>
+          <option value="personal">🙋 Personal</option>
+          <option value="idea">💡 Idea</option>
         </select>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-nota')">Cancelar</button>
-      <button class="btn-action" onclick="ModNotas.save()"><span class="material-symbols-outlined">save</span> Guardar nota</button>
+      <button class="btn-action" onclick="ModNotas.save()">💾 Guardar nota</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Crear clase -->
+<div class="modal-overlay" id="modal-crear-clase">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🏫 Nueva clase</div>
+      <button class="modal-close" onclick="closeModal('modal-crear-clase')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nombre de la clase *</label>
+        <input type="text" class="form-input" id="cc-nombre" placeholder="ej. Matemáticas III — Grupo A" maxlength="120">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Materia *</label>
+        <input type="text" class="form-input" id="cc-materia" placeholder="ej. Estadística" maxlength="80">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-textarea" id="cc-desc" placeholder="Descripción breve de la clase..." maxlength="500" style="min-height:70px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-crear-clase')">Cancelar</button>
+      <button class="btn-action" onclick="ModCrearClase.save()">🏫 Crear clase</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Clonar clase -->
+<div class="modal-overlay" id="modal-clonar-clase">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📋 Clonar clase</div>
+      <button class="modal-close" onclick="closeModal('modal-clonar-clase')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Materia (se mantiene)</label>
+        <div class="clone-materia-tag" id="cl-materia"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre de la nueva clase *</label>
+        <input type="text" class="form-input" id="cl-nombre" placeholder="Nuevo nombre" maxlength="120">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Color de clase</label>
+        <div class="color-picker-row">
+          <input type="color" class="form-color" id="cl-color" value="#1A5CFF">
+          <span class="color-hint">Color identificador de la clase</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-clonar-clase')">Cancelar</button>
+      <button class="btn-action" onclick="ModClonarClase.save()">📋 Clonar clase</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Unirse a clase -->
+<div class="modal-overlay" id="modal-unirse-clase">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🔑 Unirse a una clase</div>
+      <button class="modal-close" onclick="closeModal('modal-unirse-clase')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Código de invitación</label>
+        <div class="input-with-btn">
+          <input type="text" class="form-input" id="uc-codigo"
+                 placeholder="ej. MAT3A1"
+                 maxlength="6"
+                 onkeydown="if(event.key==='Enter') ModUnirseClase.buscar()">
+          <button class="btn-action" onclick="ModUnirseClase.buscar()">Buscar</button>
+        </div>
+      </div>
+      <div id="uc-result"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-unirse-clase')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -297,6 +408,7 @@
 <script src="js/auth-guard.js"></script>
 <script src="js/views/inicio.js"></script>
 <script src="js/views/tareas.js"></script>
+<script src="js/views/clases.js"></script>
 <script src="js/views/views.js"></script>
 <script src="js/views/notas.js"></script>
 <script src="js/views/perfil.js"></script>

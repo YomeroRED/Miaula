@@ -137,3 +137,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+/**
+ * Muestra una notificación toast temporal.
+ * @param {string} msg
+ * @param {number} [duration=3000]
+ */
+function showToast(msg, duration = 3000) {
+  let t = document.getElementById('_miaula_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_miaula_toast';
+    t.style.cssText = [
+      'position:fixed','bottom:24px','left:50%','transform:translateX(-50%) translateY(20px)',
+      'background:#1A3080','color:#fff','padding:10px 20px','border-radius:8px',
+      'font-size:13px','font-weight:500','box-shadow:0 4px 16px rgba(0,0,0,0.25)',
+      'z-index:99999','opacity:0','transition:opacity 0.25s,transform 0.25s',
+      'pointer-events:none','max-width:340px','text-align:center',
+    ].join(';');
+    document.body.appendChild(t);
+  }
+  clearTimeout(t._timer);
+  t.textContent = msg;
+  requestAnimationFrame(() => {
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  t._timer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(20px)';
+  }, duration);
+}

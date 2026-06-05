@@ -1,0 +1,277 @@
+/* ═══════════════════════════════════════
+   MiAula — clases.css
+   Estilos para la vista de Clases
+═══════════════════════════════════════ */
+
+/* ── Tarjeta de clase ──────────────────────────────────────── */
+.clase-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.clase-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.clase-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 20px 0;
+}
+
+.clase-card-header--colored {
+  padding-top: 16px;
+}
+
+.clase-nombre {
+  font-size: 1.07rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.clase-body {
+  padding: 14px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.clase-materia {
+  font-size: 0.79rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.clase-badge {
+  font-size: 1.43rem;
+}
+
+.clase-desc {
+  font-size: 0.93rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  min-height: 18px;
+}
+
+.clase-meta {
+  display: flex;
+  gap: 14px;
+  font-size: 0.86rem;
+  color: var(--text-light);
+}
+
+/* ── Código de invitación ──────────────────────────────────── */
+.clase-code-box {
+  background: var(--surface);
+  border: 1px dashed var(--border-md);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.clase-code-label {
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.clase-code-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.clase-code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.43rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--navy);
+  flex: 1;
+}
+
+.btn-copy {
+  background: var(--white);
+  border: 1px solid var(--border-md);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-copy:hover {
+  background: var(--brand-light);
+}
+
+/* ── Acciones en tarjeta ───────────────────────────────────── */
+.clase-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.btn-sm {
+  font-size: 0.86rem;
+  padding: 5px 10px !important;
+}
+
+.clase-inscrito-tag {
+  font-size: 0.86rem;
+  color: var(--green);
+  font-weight: 600;
+}
+
+/* ── Preview al buscar código ──────────────────────────────── */
+.clase-preview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.clase-preview-nombre {
+  font-size: 1.07rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.clase-preview-materia {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--brand);
+  background: var(--brand-light);
+  padding: 2px 8px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.clase-preview-desc {
+  font-size: 0.93rem;
+  color: var(--text-muted);
+}
+
+.clase-ya-inscrito {
+  font-size: 0.93rem;
+  color: var(--green);
+  font-weight: 600;
+  padding: 6px 0 2px;
+}
+
+.btn-full {
+  width: 100%;
+  margin-top: 6px;
+}
+
+/* ── Dark mode ─────────────────────────────────────────────── */
+.dark-mode .clase-card {
+  background: #1e2535;
+  border-color: rgba(255,255,255,0.08);
+}
+
+.dark-mode .clase-code-box {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.dark-mode .clase-code {
+  color: #a5b4fc;
+}
+
+.dark-mode .btn-copy {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.14);
+  color: var(--white);
+}
+
+.dark-mode .clase-preview {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+}
+
+/* ── Input con botón buscar ────────────────────────────────── */
+.input-with-btn {
+  display: flex;
+  gap: 8px;
+}
+
+.input-with-btn .form-input {
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+/* ── Clonar clase ──────────────────────────────────────────── */
+.clone-materia-tag {
+  display: inline-block;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--brand);
+  background: var(--brand-light);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-color {
+  width: 44px;
+  height: 36px;
+  border: 1px solid var(--border-md);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 2px;
+  background: var(--white);
+}
+
+.color-hint {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+/* ── Filtro de clase en tareas ─────────────────────────────── */
+.tareas-class-filter {
+  padding: 0 0 12px 0;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-label {
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.filter-select {
+  max-width: 280px;
+}

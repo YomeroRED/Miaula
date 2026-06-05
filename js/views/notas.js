@@ -15,7 +15,7 @@ const ViewNotas = {
     el.innerHTML = `
       <div class="notas-toolbar">
         <div class="notas-search-wrap">
-          <span class="notas-search-icon"><span class="material-symbols-outlined">search</span></span>
+          <span class="notas-search-icon">🔍</span>
           <input
             class="notas-search"
             id="notas-search-input"
@@ -24,7 +24,7 @@ const ViewNotas = {
             oninput="ViewNotas._onSearch(this.value)"
           >
         </div>
-        <button class="btn-action" style="margin-top:10px;align-self:flex-start" onclick="ModNotas.openModal()"><span class="material-symbols-outlined">add_circle</span> Nueva nota</button>
+        <button class="btn-action" style="margin-top:10px;align-self:flex-start" onclick="ModNotas.openModal()">📝 Nueva nota</button>
         <div class="notas-filtros" id="notas-filtros">
           ${this._filtrosBtns()}
         </div>
@@ -46,19 +46,19 @@ const ViewNotas = {
       <button
         class="filtro-btn ${this.filtroActivo === e ? 'active' : ''}"
         onclick="ViewNotas._setFiltro('${e}')"
-      >${e === 'todas' ? '<span class="material-symbols-outlined">filter_list</span> Todas' : this._etiqLabel(e)}</button>
+      >${e === 'todas' ? '📋 Todas' : this._etiqLabel(e)}</button>
     `).join('');
   },
 
   _etiqLabel(e) {
     const map = {
-      clase:     '<span class="material-symbols-outlined">menu_book</span> Clase',
-      personal:  '<span class="material-symbols-outlined">person</span> Personal',
-      examen:    '<span class="material-symbols-outlined">edit</span> Examen',
-      proyecto:  '<span class="material-symbols-outlined">folder_special</span> Proyecto',
-      idea:      '<span class="material-symbols-outlined">lightbulb</span> Idea',
+      clase:     '📚 Clase',
+      personal:  '🙋 Personal',
+      examen:    '✏️ Examen',
+      proyecto:  '🗂 Proyecto',
+      idea:      '💡 Idea',
     };
-    return map[e] || `<span class="material-symbols-outlined">label</span> ${e}`;
+    return map[e] || `🏷 ${e}`;
   },
 
   _setFiltro(f) {
@@ -98,7 +98,7 @@ const ViewNotas = {
 
     if (!notas.length) {
       grid.innerHTML = emptyState(
-        '<span class="material-symbols-outlined">edit_note</span>',
+        '📝',
         this.busqueda ? 'Sin resultados' : 'Sin notas',
         this.busqueda
           ? 'Intenta con otras palabras.'
@@ -120,7 +120,7 @@ const ViewNotas = {
       default:  { bg: '#F3F4F6', accent: '#6B7280' },
     };
     const col    = PALETA[n.etiqueta] || PALETA.default;
-    const pinBtn = n.fijada ? '<span class="material-symbols-outlined">push_pin</span>' : '<span class="material-symbols-outlined">location_on</span>';
+    const pinBtn = n.fijada ? '📌' : '📍';
     const preview = n.contenido.length > 140
       ? n.contenido.slice(0, 140) + '…'
       : n.contenido;
@@ -135,10 +135,10 @@ const ViewNotas = {
         ${n.etiqueta ? `<span class="nota-etiq">${this._etiqLabel(n.etiqueta)}</span>` : ''}
         <div class="nota-card-preview">${preview || '<em class="text-muted">Sin contenido</em>'}</div>
         <div class="nota-card-footer">
-          <span class="nota-fecha"><span class="material-symbols-outlined">calendar_today</span> ${formatDate(n.fechaMod || n.fecha)}</span>
+          <span class="nota-fecha">📅 ${formatDate(n.fechaMod || n.fecha)}</span>
           <div class="nota-actions">
-            <button class="btn-secondary btn-sm" onclick="ViewNotas.editar(${n.id})"><span class="material-symbols-outlined">edit</span> Editar</button>
-            <button class="btn-danger btn-sm"    onclick="ViewNotas.eliminar(${n.id})"><span class="material-symbols-outlined">delete</span></button>
+            <button class="btn-secondary btn-sm" onclick="ViewNotas.editar(${n.id})">✏️ Editar</button>
+            <button class="btn-danger btn-sm"    onclick="ViewNotas.eliminar(${n.id})">🗑</button>
           </div>
         </div>
       </div>`;

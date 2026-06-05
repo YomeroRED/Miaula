@@ -52,6 +52,25 @@ const ViewPerfil = {
           </div>
           <div class="perfil-email-display">${user.email}</div>
 
+          <div class="perfil-stats">
+            <div class="perfil-stat">
+              <div class="perfil-stat-val">${tareasCount}</div>
+              <div class="perfil-stat-lbl">${tareasLabel}</div>
+            </div>
+            <div class="perfil-stat">
+              <div class="perfil-stat-val">${entregasCount}</div>
+              <div class="perfil-stat-lbl">${entregasLabel}</div>
+            </div>
+            <div class="perfil-stat">
+              <div class="perfil-stat-val">${notasCount}</div>
+              <div class="perfil-stat-lbl">Notas</div>
+            </div>
+            ${!isDocente && prom !== '—' ? `
+            <div class="perfil-stat">
+              <div class="perfil-stat-val">${prom}</div>
+              <div class="perfil-stat-lbl">Promedio / 10</div>
+            </div>` : ''}
+          </div>
         </div>
 
         <!-- Columna derecha: formulario -->
@@ -105,7 +124,7 @@ const ViewPerfil = {
                        class="font-size-range"
                        oninput="ViewPerfil._setFontSizePx(+this.value)">
                 <span class="font-size-range-lbl font-size-range-lbl--lg">A</span>
-                <span class="font-size-range-val" id="font-size-range-val">${ViewPerfil._getFontSizeLabel()}</span>
+                <span class="font-size-range-val" id="font-size-range-val">${ViewPerfil._getFontSizePx()}px</span>
               </div>
             </div>
           </div>
@@ -289,36 +308,33 @@ const ViewPerfil = {
     return stored || map[this._getFontSize()] || 15;
   },
 
-  _getFontSizeLabel() {
-    const labels = { small: 'Pequeña', normal: 'Normal', large: 'Grande', xlarge: 'Muy grande' };
-    return labels[this._getFontSize()] || 'Normal';
-  },
-
   _setFontSize(size) {
     const map = { small: 12, normal: 14, large: 16, xlarge: 17 };
     localStorage.setItem('miaula_font_size', size);
     localStorage.setItem('miaula_font_size_px', map[size]);
     ViewPerfil._applyFontSize(map[size]);
+    // Refresh buttons
     document.querySelectorAll('.font-size-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.size === size);
     });
     const rangeEl = document.getElementById('font-size-range');
     const valEl   = document.getElementById('font-size-range-val');
     if (rangeEl) rangeEl.value = map[size];
-    if (valEl)   valEl.textContent = ViewPerfil._getFontSizeLabel();
+    if (valEl)   valEl.textContent = map[size] + 'px';
   },
 
   _setFontSizePx(px) {
     const clamped = Math.max(12, Math.min(20, px));
     localStorage.setItem('miaula_font_size_px', clamped);
-    const named = clamped <= 12 ? 'small' : clamped <= 14 ? 'normal' : clamped <= 16 ? 'large' : 'xlarge';
+    // Infer named size
+    const named = clamped <= 13 ? 'small' : clamped >= 17 ? 'large' : 'normal';
     localStorage.setItem('miaula_font_size', named);
     ViewPerfil._applyFontSize(clamped);
     document.querySelectorAll('.font-size-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.size === named);
     });
     const valEl = document.getElementById('font-size-range-val');
-    if (valEl) valEl.textContent = ViewPerfil._getFontSizeLabel();
+    if (valEl) valEl.textContent = clamped + 'px';
   },
 
   _applyFontSize(px) {

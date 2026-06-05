@@ -23,10 +23,23 @@
 .stat-card.green  { border-top: 3px solid var(--green); }
 .stat-card.amber  { border-top: 3px solid var(--amber); }
 .stat-card.red    { border-top: 3px solid var(--accent); }
-.stat-icon  { font-size: 22px; margin-bottom: 6px; }
-.stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.7px; }
-.stat-value { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.1; }
-.stat-sub   { font-size: 11px; color: var(--text-light); }
+
+/* New semantic stat cards */
+.stat-card--blue  { border-top: 3px solid #3b82f6; background: linear-gradient(135deg,#eff6ff 0%,#fff 60%); }
+.stat-card--green { border-top: 3px solid #10b981; background: linear-gradient(135deg,#ecfdf5 0%,#fff 60%); }
+.stat-card--amber { border-top: 3px solid #f59e0b; background: linear-gradient(135deg,#fffbeb 0%,#fff 60%); }
+.stat-card--red   { border-top: 3px solid #ef4444; background: linear-gradient(135deg,#fef2f2 0%,#fff 60%); }
+.stat-card--info  { border-top: 3px solid #8b5cf6; background: linear-gradient(135deg,#f5f3ff 0%,#fff 60%); }
+
+.stat-card--blue  .stat-value { color: #1d4ed8; }
+.stat-card--green .stat-value { color: #059669; }
+.stat-card--amber .stat-value { color: #d97706; }
+.stat-card--red   .stat-value { color: #dc2626; }
+.stat-card--info  .stat-value { color: #7c3aed; }
+.stat-icon  { font-size: 1.57rem; margin-bottom: 6px; }
+.stat-label { font-size: 0.79rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.7px; }
+.stat-value { font-size: 1.43rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+.stat-sub   { font-size: 0.79rem; color: var(--text-light); }
 
 /* ── Tareas: Cards ── */
 .cards-grid {
@@ -52,9 +65,9 @@
   justify-content: space-between;
   gap: 8px;
 }
-.task-card-title  { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; }
-.task-card-materia{ font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-.task-card-desc   { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+.task-card-title  { font-size: 1rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+.task-card-materia{ font-size: 0.79rem; color: var(--text-muted); margin-top: 2px; }
+.task-card-desc   { font-size: 0.93rem; color: var(--text-muted); line-height: 1.5; }
 .task-card-footer {
   display: flex;
   align-items: center;
@@ -62,74 +75,43 @@
   margin-top: 4px;
 }
 .task-card-due {
-  font-size: 11px;
+  font-size: 0.79rem;
   color: var(--text-light);
   display: flex; align-items: center; gap: 4px;
 }
 .task-actions { display: flex; gap: 6px; }
 .task-info-row {
-  font-size: 12px;
+  font-size: 0.86rem;
   color: var(--text-muted);
   display: flex;
   gap: 12px;
 }
 
 /* ── Recursos ── */
-/* ── Recursos — grid de tarjetas (mismo estilo que task-card) ── */
-.resources-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
-}
+.resources-list { display: flex; flex-direction: column; gap: 12px; }
 .resource-card {
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 18px 20px;
+  padding: 16px 18px;
   box-shadow: var(--shadow);
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transition: box-shadow 0.2s, transform 0.2s;
+  align-items: center;
+  gap: 14px;
+  transition: box-shadow 0.2s;
 }
-.resource-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-
-/* Cabecera: ícono grande + nombre + acciones */
-.resource-card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
+.resource-card:hover { box-shadow: var(--shadow-md); }
 .resource-icon {
-  width: 48px; height: 48px;
-  border-radius: 12px;
+  width: 46px; height: 46px;
+  border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
+  font-size: 1.43rem;
   flex-shrink: 0;
 }
-/* Ícono material dentro del cuadro de color */
-.resource-icon .material-symbols-outlined {
-  font-size: 26px;           /* Grande y bien visible */
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
-}
-.resource-card-body { flex: 1; min-width: 0; }
-.resource-name { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; }
-.resource-meta {
-  font-size: 11px; color: var(--text-muted); margin-top: 3px;
-  display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
-}
-/* Ícono pequeño en la meta (tipo) */
-.resource-meta .material-symbols-outlined {
-  font-size: 13px;
-  vertical-align: -2px;
-}
-.resource-desc { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
-.resource-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  margin-top: 4px;
-}
+.resource-name { font-size: 1rem; font-weight: 500; color: var(--text); }
+.resource-meta { font-size: 0.79rem; color: var(--text-muted); margin-top: 2px; }
+.resource-desc { font-size: 0.86rem; color: var(--text-muted); margin-top: 4px; }
+.resource-actions { margin-left: auto; display: flex; gap: 6px; }
 
 /* ── Calificaciones: Notas ── */
 .notas-list { display: flex; flex-direction: column; gap: 12px; }
@@ -147,17 +129,17 @@
   width: 58px; height: 58px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 700;
+  font-size: 1.29rem; font-weight: 700;
   flex-shrink: 0;
 }
 .nota-circle.high { background: var(--green-light); color: var(--green); }
 .nota-circle.mid  { background: var(--amber-light); color: var(--amber); }
 .nota-circle.low  { background: var(--red-light);   color: var(--red); }
 .nota-info { flex: 1; }
-.nota-materia     { font-size: 14px; font-weight: 600; color: var(--text); }
-.nota-tarea       { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.nota-fecha       { font-size: 11px; color: var(--text-light); margin-top: 3px; }
-.nota-comentario  { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
+.nota-materia     { font-size: 1rem; font-weight: 600; color: var(--text); }
+.nota-tarea       { font-size: 0.86rem; color: var(--text-muted); margin-top: 2px; }
+.nota-fecha       { font-size: 0.79rem; color: var(--text-light); margin-top: 3px; }
+.nota-comentario  { font-size: 0.86rem; color: var(--text-muted); margin-top: 6px; font-style: italic; }
 
 /* ── Mensajes ── */
 .msg-layout {
@@ -175,7 +157,7 @@
 .msg-list-header {
   padding: 14px 16px;
   border-bottom: 1px solid var(--border);
-  font-size: 13px; font-weight: 600;
+  font-size: 0.93rem; font-weight: 600;
   color: var(--text);
   background: var(--surface);
 }
@@ -200,13 +182,13 @@
   display: inline-block;
   flex-shrink: 0;
 }
-.msg-item-name    { font-size: 13px; font-weight: 500; color: var(--text); }
+.msg-item-name    { font-size: 0.93rem; font-weight: 500; color: var(--text); }
 .msg-item-preview {
-  font-size: 12px; color: var(--text-muted);
+  font-size: 0.86rem; color: var(--text-muted);
   margin-top: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.msg-item-time { font-size: 10px; color: var(--text-light); }
+.msg-item-time { font-size: 0.71rem; color: var(--text-light); }
 
 .msg-main  { display: flex; flex-direction: column; }
 .msg-topbar {
@@ -215,8 +197,8 @@
   display: flex; align-items: center; gap: 10px;
   background: var(--surface);
 }
-.msg-contact-name { font-size: 14px; font-weight: 600; color: var(--text); }
-.msg-contact-role { font-size: 11px; color: var(--text-muted); }
+.msg-contact-name { font-size: 1rem; font-weight: 600; color: var(--text); }
+.msg-contact-role { font-size: 0.79rem; color: var(--text-muted); }
 .msg-body {
   flex: 1; overflow-y: auto;
   padding: 18px;
@@ -226,7 +208,7 @@
   max-width: 68%;
   padding: 10px 14px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 0.93rem;
   line-height: 1.5;
 }
 .bubble.me {
@@ -242,7 +224,7 @@
   border-bottom-left-radius: 3px;
   border: 1px solid var(--border);
 }
-.bubble-time { font-size: 10px; opacity: 0.6; margin-top: 4px; }
+.bubble-time { font-size: 0.71rem; opacity: 0.6; margin-top: 4px; }
 .msg-input-bar {
   padding: 12px 16px;
   border-top: 1px solid var(--border);
@@ -255,7 +237,7 @@
   border: 1.5px solid var(--border-md);
   border-radius: var(--radius);
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 0.93rem;
   outline: none;
 }
 .msg-input:focus { border-color: var(--brand); }
@@ -270,7 +252,7 @@
   padding: 12px 14px;
   background: var(--surface);
   border-radius: var(--radius);
-  font-size: 13px;
+  font-size: 0.93rem;
   color: var(--text-muted);
   margin-bottom: 16px;
   line-height: 1.6;
@@ -290,9 +272,9 @@
   transition: border-color 0.2s;
 }
 .adjunto-box:hover { border-color: var(--brand); }
-.adjunto-icon      { font-size: 22px; }
-.adjunto-label     { font-size: 13px; font-weight: 500; color: var(--text); }
-.adjunto-sub       { font-size: 11px; color: var(--text-muted); }
+.adjunto-icon      { font-size: 1.57rem; }
+.adjunto-label     { font-size: 0.93rem; font-weight: 500; color: var(--text); }
+.adjunto-sub       { font-size: 0.79rem; color: var(--text-muted); }
 
 /* ── Notas Personales ── */
 .notas-toolbar {
@@ -312,7 +294,7 @@
   left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 14px;
+  font-size: 1rem;
   pointer-events: none;
 }
 .notas-search {
@@ -321,7 +303,7 @@
   border: 1px solid var(--border-md);
   border-radius: var(--radius);
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 0.93rem;
   color: var(--text);
   background: var(--white);
   outline: none;
@@ -340,7 +322,7 @@
   border: 1px solid var(--border-md);
   background: var(--white);
   font-family: var(--font);
-  font-size: 12px;
+  font-size: 0.86rem;
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s;
@@ -382,14 +364,14 @@
   gap: 8px;
 }
 .nota-card-titulo {
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
   line-height: 1.4;
   flex: 1;
 }
 .nota-card-pin {
-  font-size: 16px;
+  font-size: 1.14rem;
   cursor: pointer;
   opacity: 0.55;
   transition: opacity 0.15s, transform 0.15s;
@@ -399,7 +381,7 @@
 
 .nota-etiq {
   display: inline-block;
-  font-size: 11px;
+  font-size: 0.79rem;
   font-weight: 500;
   color: var(--nota-accent, var(--brand));
   background: color-mix(in srgb, var(--nota-accent, var(--brand)) 12%, transparent);
@@ -409,7 +391,7 @@
 }
 
 .nota-card-preview {
-  font-size: 13px;
+  font-size: 0.93rem;
   color: var(--text-muted);
   line-height: 1.55;
   white-space: pre-wrap;
@@ -426,7 +408,7 @@
   margin-top: 4px;
 }
 .nota-fecha {
-  font-size: 11px;
+  font-size: 0.79rem;
   color: var(--text-light);
 }
 .nota-actions { display: flex; gap: 6px; }
@@ -470,7 +452,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 1.86rem;
   font-weight: 700;
   color: #fff;
   letter-spacing: 1px;
@@ -485,7 +467,7 @@
   border-radius: 50%;
   border: 2px solid var(--white);
   background: var(--surface);
-  font-size: 12px;
+  font-size: 0.86rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -496,19 +478,19 @@
 .perfil-avatar-edit:hover { background: var(--brand-light); }
 
 .perfil-name {
-  font-size: 15px;
+  font-size: 1.07rem;
   font-weight: 600;
   color: var(--text);
   line-height: 1.3;
 }
 .perfil-role-badge {
-  font-size: 12px;
+  font-size: 0.86rem;
   font-weight: 500;
   padding: 3px 12px;
   border-radius: 20px;
 }
 .perfil-email-display {
-  font-size: 11px;
+  font-size: 0.79rem;
   color: var(--text-muted);
   word-break: break-all;
 }
@@ -527,13 +509,13 @@
   text-align: center;
 }
 .perfil-stat-val {
-  font-size: 20px;
+  font-size: 1.43rem;
   font-weight: 700;
   color: var(--text);
   line-height: 1.1;
 }
 .perfil-stat-lbl {
-  font-size: 10px;
+  font-size: 0.71rem;
   color: var(--text-muted);
   margin-top: 2px;
   text-transform: uppercase;
@@ -557,7 +539,7 @@
   gap: 14px;
 }
 .perfil-section-title {
-  font-size: 13px;
+  font-size: 0.93rem;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -568,7 +550,7 @@
 .perfil-save-btn { align-self: flex-start; }
 
 .perfil-success {
-  font-size: 13px;
+  font-size: 0.93rem;
   color: var(--green);
   background: var(--green-light);
   border-radius: var(--radius);
@@ -591,9 +573,156 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 1.07rem;
   opacity: 0.6;
   transition: opacity 0.15s;
   padding: 0;
 }
 .pass-toggle:hover { opacity: 1; }
+
+/* ═══════════════════════════════════════
+   Dark Mode — Vistas
+═══════════════════════════════════════ */
+
+/* Stats */
+body.dark-mode .stat-card {
+  background: var(--dm-card);
+  border-color: var(--border);
+}
+body.dark-mode .stat-value { color: var(--text); }
+body.dark-mode .stat-label { color: var(--text-muted); }
+body.dark-mode .stat-sub   { color: var(--text-light); }
+body.dark-mode .stat-card--blue,
+body.dark-mode .stat-card--green,
+body.dark-mode .stat-card--amber,
+body.dark-mode .stat-card--red,
+body.dark-mode .stat-card--info  { background: var(--dm-card); }
+body.dark-mode .stat-card--blue  .stat-value { color: #93c5fd; }
+body.dark-mode .stat-card--green .stat-value { color: #6ee7b7; }
+body.dark-mode .stat-card--amber .stat-value { color: #fcd34d; }
+body.dark-mode .stat-card--red   .stat-value { color: #fca5a5; }
+body.dark-mode .stat-card--info  .stat-value { color: #c4b5fd; }
+
+/* Tareas */
+body.dark-mode .task-card {
+  background: var(--dm-card);
+  border-color: var(--border);
+}
+body.dark-mode .task-card-title   { color: var(--text); }
+body.dark-mode .task-card-materia { color: var(--text-muted); }
+body.dark-mode .task-card-desc    { color: var(--text-muted); }
+body.dark-mode .task-card-due     { color: var(--text-light); }
+
+/* Recursos */
+body.dark-mode .resource-card {
+  background: var(--dm-card);
+  border-color: var(--border);
+}
+body.dark-mode .resource-name { color: var(--text); }
+body.dark-mode .resource-meta { color: var(--text-muted); }
+body.dark-mode .resource-desc { color: var(--text-muted); }
+
+/* Calificaciones */
+body.dark-mode .nota-card {
+  background: var(--dm-card);
+  border-color: var(--border);
+}
+body.dark-mode .nota-materia { color: var(--text); }
+body.dark-mode .nota-tarea   { color: var(--text-muted); }
+body.dark-mode .nota-fecha   { color: var(--text-light); }
+body.dark-mode .nota-comentario { color: var(--text-muted); }
+
+/* Mensajes */
+body.dark-mode .msg-layout {
+  background: var(--dm-card);
+  border-color: var(--border);
+}
+body.dark-mode .msg-list-header {
+  background: var(--dm-input-bg);
+  color: var(--text);
+  border-bottom-color: var(--border);
+}
+body.dark-mode .msg-item          { border-bottom-color: var(--border); }
+body.dark-mode .msg-item:hover    { background: rgba(255,255,255,0.04); }
+body.dark-mode .msg-item.active   { background: rgba(26,92,255,0.18); }
+body.dark-mode .msg-item.msg-unread {
+  background: rgba(26,92,255,0.1);
+  border-left-color: var(--brand);
+}
+body.dark-mode .msg-item-name     { color: var(--text); }
+body.dark-mode .msg-item-preview  { color: var(--text-muted); }
+body.dark-mode .msg-item-time     { color: var(--text-light); }
+body.dark-mode .msg-topbar {
+  background: var(--dm-input-bg);
+  border-bottom-color: var(--border);
+}
+body.dark-mode .msg-contact-name  { color: var(--text); }
+body.dark-mode .msg-contact-role  { color: var(--text-muted); }
+body.dark-mode .bubble.them {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-color: var(--border);
+}
+body.dark-mode .msg-input-bar {
+  background: var(--dm-card);
+  border-top-color: var(--border);
+}
+body.dark-mode .msg-input {
+  background: var(--dm-input-bg);
+  border-color: var(--border-md);
+  color: var(--text);
+}
+body.dark-mode .msg-input:focus { border-color: var(--brand); }
+
+/* Notas personales */
+body.dark-mode .notas-search {
+  background: var(--dm-input-bg);
+  border-color: var(--border-md);
+  color: var(--text);
+}
+body.dark-mode .filtro-btn {
+  background: var(--dm-card);
+  border-color: var(--border-md);
+  color: var(--text-muted);
+}
+body.dark-mode .filtro-btn:hover  { border-color: var(--brand); color: var(--brand); }
+body.dark-mode .filtro-btn.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+body.dark-mode .nota-card {
+  background: linear-gradient(160deg, var(--dm-card) 0%, #161b22 100%);
+  border-color: var(--border);
+}
+body.dark-mode .nota-card-titulo { color: var(--text); }
+body.dark-mode .nota-card-preview { color: var(--text-muted); }
+
+/* Entrega / adjunto */
+body.dark-mode .entrega-info-box {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-muted);
+}
+body.dark-mode .entrega-info-box strong { color: var(--text); }
+body.dark-mode .adjunto-box {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--border-md);
+}
+body.dark-mode .adjunto-label { color: var(--text); }
+body.dark-mode .adjunto-sub   { color: var(--text-muted); }
+
+/* Perfil */
+body.dark-mode .perfil-sidebar,
+body.dark-mode .perfil-section {
+  background: var(--dm-card);
+  border-color: var(--border);
+}
+body.dark-mode .perfil-name           { color: var(--text); }
+body.dark-mode .perfil-email-display  { color: var(--text-muted); }
+body.dark-mode .perfil-stat           { background: rgba(255,255,255,0.05); }
+body.dark-mode .perfil-stat-val       { color: var(--text); }
+body.dark-mode .perfil-stat-lbl       { color: var(--text-muted); }
+body.dark-mode .perfil-section-title  { color: var(--text-muted); border-bottom-color: var(--border); }
+body.dark-mode .perfil-avatar-edit    { background: rgba(255,255,255,0.07); border-color: var(--dm-card); }
+body.dark-mode .perfil-avatar-edit:hover { background: rgba(26,92,255,0.2); }
+body.dark-mode .pass-toggle           { color: var(--text-muted); }
