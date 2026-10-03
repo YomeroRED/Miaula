@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cronograma del Curso - Charay</title>
+<style>
+:root{--bg:#f5f6fa;--fg:#1f2430;--card:#ffffff;--accent:#2563eb;--accent2:#16a34a;--warn:#b45309;--muted:#6b7280;--border:#d7dae1;--radius:14px;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15181f;--fg:#e8eaf0;--card:#1f2430;--border:#333a47;--muted:#9aa2b1;}}
+:root[data-theme="dark"]{--bg:#15181f;--fg:#e8eaf0;--card:#1f2430;--border:#333a47;--muted:#9aa2b1;}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--fg);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+header{background:var(--accent);color:#fff;padding:18px 16px;padding-top:calc(18px + env(safe-area-inset-top,0px));}
+header h1{margin:0;font-size:1.3rem;}
+header p{margin:6px 0 0;opacity:.9;font-size:.9rem;}
+main{max-width:720px;margin:0 auto;padding:20px 16px 60px;}
+.mes-title{margin:28px 0 10px;font-size:1.1rem;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+.card.current{border-color:var(--accent);border-width:2px;}
+.badge{display:inline-block;background:var(--accent);color:#fff;font-size:.75rem;padding:2px 8px;border-radius:12px;margin-bottom:6px;}
+.fecha{font-weight:bold;}
+.tema{margin:4px 0 8px;color:var(--fg);}
+.nota{color:var(--warn);font-size:.85rem;margin-bottom:8px;}
+.act-link{display:inline-block;background:var(--accent2);color:#fff;text-decoration:none;padding:8px 14px;border-radius:8px;font-size:.9rem;}
+.act-empty{color:var(--muted);font-size:.9rem;}
+.admin-row{margin-top:8px;display:flex;gap:8px;}
+.btn-sm{background:none;border:1px solid var(--border);color:var(--fg);padding:5px 10px;border-radius:6px;font-size:.8rem;cursor:pointer;}
+</style>
+</head>
+<body>
+<header>
+  <h1>📅 Cronograma del Curso de Computación</h1>
+  <p>Comunidad de Charay, El Fuerte, Sinaloa</p>
+</header>
+<main id="main"></main>
+
+<script id="data">
+const MESES = [
+{nombre:"Mes 2 — Hardware y manejo del equipo",semanas:[
+ {fecha:"Sábado 10/10/2026",tema:"Bienvenida a Classroom + reconocimiento de hardware y manejo del mouse",actividad:{titulo:"Formulario de bienvenida",link:"https://docs.google.com/forms/d/e/1FAIpQLSdWBDYnIZasiakjgyYVONYbMbOEVOoEJxNK1hOkCO_RuNppww/viewform?usp=header"}},
+ {fecha:"Sábado 17/10/2026",tema:"Manejo del mouse (continuación) y mecanografía básica",actividad:null},
+ {fecha:"Sábado 24/10/2026",tema:"Mecanografía básica (continuación)",actividad:null},
+ {fecha:"Sábado 31/10/2026",tema:"Interfaz gráfica del sistema operativo: escritorio, íconos, ventanas y menús",actividad:null}
+]},
+{nombre:"Mes 3 — Procesador de texto y dibujo",semanas:[
+ {fecha:"Sábado 07/11/2026",tema:"Procesador de texto: abrir, escribir y guardar un documento sencillo",actividad:null},
+ {fecha:"Sábado 14/11/2026",tema:"Formato de texto: negritas, tamaño de letra, color",actividad:null},
+ {fecha:"Sábado 21/11/2026",tema:"Herramientas de dibujo digital",actividad:null},
+ {fecha:"Sábado 28/11/2026",tema:"Proyecto creativo: combinar texto y dibujo en un trabajo propio",actividad:null}
+]},
+{nombre:"Mes 4 — Archivos y carpetas",semanas:[
+ {fecha:"Sábado 05/12/2026",tema:"¿Qué es un archivo y una carpeta? Conceptos básicos de organización digital",actividad:null},
+ {fecha:"Sábado 12/12/2026",tema:"Crear y nombrar carpetas (práctica guiada)",actividad:null},
+ {fecha:"Sábado 19/12/2026",tema:"Guardar y localizar archivos",actividad:null},
+ {fecha:"Sábado 26/12/2026",tema:"Organización de sus propios archivos (ejercicio de cierre de mes)",nota:"Cae justo después de Navidad: la biblioteca podría estar cerrada.",actividad:null}
+]},
+{nombre:"Mes 5 — Internet seguro",semanas:[
+ {fecha:"Sábado 02/01/2027",tema:"¿Qué es internet? Introducción sencilla y segura",nota:"Cae justo después de Año Nuevo: la biblioteca podría estar cerrada.",actividad:null},
+ {fecha:"Sábado 09/01/2027",tema:"Navegación guiada: uso básico de un navegador",actividad:null},
+ {fecha:"Sábado 16/01/2027",tema:"Privacidad digital: qué información no se comparte en línea",actividad:null},
+ {fecha:"Sábado 23/01/2027",tema:"Reconocer riesgos comunes al navegar",actividad:null}
+]},
+{nombre:"Mes 6 — Evaluación y cierre",semanas:[
+ {fecha:"Sábado 30/01/2027",tema:"Repaso integrador de todo lo visto en el curso",actividad:null},
+ {fecha:"Sábado 06/02/2027",tema:"Evaluación práctica final",actividad:null},
+ {fecha:"Sábado 13/02/2027",tema:"Preparación del evento de cierre (logística)",actividad:null},
+ {fecha:"Sábado 20/02/2027",tema:"Evento de cierre y entrega de constancias",actividad:null}
+]}
+];
+</script>
+<script>
+let canEdit = false;
+
+function parseFecha(f){
+  const m = f.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  return new Date(Number(m[3]), Number(m[2])-1, Number(m[1]));
+}
+
+function render(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  let currentMarked = false;
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  MESES.forEach((mes, mi)=>{
+    const h = document.createElement('h2'); h.className='mes-title'; h.textContent = mes.nombre;
+    main.appendChild(h);
+    mes.semanas.forEach((sem, si)=>{
+      const card = document.createElement('div'); card.className='card';
+      const d = parseFecha(sem.fecha);
+      if(!currentMarked && d >= today){ card.classList.add('current'); currentMarked = true; }
+      let html = '';
+      if(card.classList.contains('current')) html += '<span class="badge">Próxima sesión</span><br>';
+      html += '<span class="fecha">'+sem.fecha+'</span><p class="tema">'+sem.tema+'</p>';
+      if(sem.nota) html += '<p class="nota">⚠️ '+sem.nota+'</p>';
+      if(sem.actividad) html += '<a class="act-link" href="'+sem.actividad.link+'" target="_blank" rel="noopener">Abrir: '+sem.actividad.titulo+' →</a>';
+      else html += '<p class="act-empty">Actividad: próximamente</p>';
+      if(canEdit){
+        html += '<div class="admin-row">';
+        html += '<button class="btn-sm" onclick="editActivity('+mi+','+si+')">'+(sem.actividad?'Editar actividad':'Agregar actividad')+'</button>';
+        if(sem.actividad) html += '<button class="btn-sm" onclick="removeActivity('+mi+','+si+')">Quitar</button>';
+        html += '</div>';
+      }
+      card.innerHTML = html;
+      main.appendChild(card);
+    });
+  });
+}
+
+function editActivity(mi, si){
+  const sem = MESES[mi].semanas[si];
+  const titulo = prompt('Título de la actividad:', sem.actividad ? sem.actividad.titulo : '');
+  if(titulo === null) return;
+  const link = prompt('Enlace de la actividad (URL):', sem.actividad ? sem.actividad.link : '');
+  if(link === null) return;
+  sem.actividad = (titulo.trim() || link.trim()) ? {titulo: titulo.trim(), link: link.trim()} : null;
+  saveAndPublish();
+}
+
+function removeActivity(mi, si){
+  if(!confirm('¿Quitar esta actividad?')) return;
+  MESES[mi].semanas[si].actividad = null;
+  saveAndPublish();
+}
+
+function buildFullHTML(){
+  document.getElementById('data').textContent = '\nconst MESES = ' + JSON.stringify(MESES) + ';\n';
+  return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+}
+
+async function saveAndPublish(){
+  render();
+  const art = await claude.use('artifact').catch(()=>null);
+  if(!art){ alert('No se pudo guardar: no tienes permiso de edición en esta vista.'); return; }
+  try{ await art.publish(buildFullHTML()); }
+  catch(e){ alert('No se pudo guardar el cambio. Intenta de nuevo.'); }
+}
+
+(async function init(){
+  try{
+    const user = await claude.use('user');
+    canEdit = !!(user && user.canEdit && user.canEdit());
+  }catch(e){ canEdit = false; }
+  render();
+})();
+</script>
+</body>
+</html>
